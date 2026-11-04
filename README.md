@@ -36,22 +36,16 @@ Folder: codealpha_tasks/CodeAlpha_Artificial_Intelligence_Chatbot/
 
 <h4>How to Run:</h4>
 
-Open a terminal in the chatbot project folder:
-cd codealpha_tasks/CodeAlpha_Artificial_Intelligence_Chatbot
-
-Compile the Java source files:
-bash build.sh
-
-Start the chatbot:
-java -cp out chatbot.Main
-
-Open http://localhost:8080 in your browser.
+Open a terminal in the chatbot project folder : cd codealpha_tasks/CodeAlpha_Artificial_Intelligence_Chatbot
+Compile the Java source files : bash build.sh
+Start the chatbot : java -cp out chatbot.Main
+Open http://localhost : 8080 in your browser.
 
 <h4>Other available commands:</h4>
 
-java -cp out chatbot.Main --train
-java -cp out chatbot.Main --ask "your question here"
-java -cp out chatbot.Main --selftest
+java -cp out chatbot.Main --train <br>
+java -cp out chatbot.Main --ask "your question here" <br>
+java -cp out chatbot.Main --selftest <br>
 java -cp out chatbot.Main --port 9090
 
 <h3>Requirement: Java Development Kit (JDK).</h3>
@@ -62,7 +56,7 @@ Folder: codealpha_tasks/CodeAlpha_Hotel_Reservation/
 
 <p>The Hotel Reservation System is a Python application that simulates the reservation process of a hotel. Users can search for available rooms, make bookings, view reservation details, and cancel reservations.</p>
 
-<h4>Key Features</h4>
+<h4>Key Features:</h4>
 <ul>
   <li>Search rooms by check-in/check-out dates, room category, number of guests, and budget.</li>
   <li>Support for Standard, Deluxe, and Suite room categories.</li>
@@ -75,7 +69,7 @@ Folder: codealpha_tasks/CodeAlpha_Hotel_Reservation/
   <li>Store room and reservation information in JSON files so records remain available after restarting the application.</li>
 </ul>
 
-<h4>Technologies Used</h4>
+<h4>Technologies Used:</h4>
 <ul>
   <li>Python 3.10+</li>
   <li>Object-Oriented Programming (OOP)</li>
@@ -83,124 +77,97 @@ Folder: codealpha_tasks/CodeAlpha_Hotel_Reservation/
   <li>Python standard library</li>
 </ul>
 
-<h4>How to Run</h4>
+<h4>How to Run:</h4>
 
-Open a terminal in the hotel reservation project folder:
-cd codealpha_tasks/CodeAlpha_Hotel_Reservation
+Open a terminal in the hotel reservation project folder : cd codealpha_tasks/CodeAlpha_Hotel_Reservation <br>
 python main.py
 
 The application opens an interactive console menu. On its first run, it creates the demo room inventory in the data directory.
 
-To run the test suite:
-python -m unittest discover -s tests -v
+To run the test suite : python -m unittest discover -s tests -v
 
 <h3>Requirement: Python 3.10 or later. No third-party Python packages are required.</h3>
 
 <em>Note: The payment gateway is simulated for demonstration purposes; it does not process real payments.</em>
 
-3. Stock Trading Platform
+<h2> 3. Stock Trading Platform </h2>
 
 Folder: codealpha_tasks/CodeAlpha_Stock_Trading_Platform/
 
-The Stock Trading Platform is a web-based stock-market simulation. Users can create trading accounts, buy and sell shares using virtual cash, and track their portfolios as simulated stock prices change over time.
+<p>The Stock Trading Platform is a web-based stock-market simulation. Users can create trading accounts, buy and sell shares using virtual cash, and track their portfolios as simulated stock prices change over time.</p>
 
-Key Features
+<h4>Key Features:</h4>
+<ul>
+  <li>Simulated market containing a selection of stocks.</li>
+  <li>Stock prices that update automatically at regular intervals.</li>
+  <li>Create and manage user trading accounts.</li>
+  <li>Buy and sell shares with order validation.</li>
+  <li>Check available cash and prevent purchases or sales that exceed account limits.</li>
+  <li>Track cash balance, stock holdings, and portfolio value.</li>
+  <li>View transaction history and realised profit/loss.</li>
+  <li>Record portfolio performance snapshots over time.</li>
+  <li>Store users, stock data, holdings, transactions, and performance history in an SQLite database.</li>
+  <li>Browser-based dashboard served by a Node.js HTTP server.</li>
+</ul>
 
-Simulated market containing a selection of stocks.
+<h4>Technologies Used:</h4>
+<ul>
+  <li>JavaScript (ES modules)</li>
+  <li>Node.js</li>
+  <li>SQLite</li>
+  <li>HTML, CSS and JavaScript</li>
+</ul>
 
-Stock prices that update automatically at regular intervals.
+<h4>How to Run:</h4>
 
-Create and manage user trading accounts.
-
-Buy and sell shares with order validation.
-
-Check available cash and prevent purchases or sales that exceed account limits.
-
-Track cash balance, stock holdings, and portfolio value.
-
-View transaction history and realised profit/loss.
-
-Record portfolio performance snapshots over time.
-
-Store users, stock data, holdings, transactions, and performance history in an SQLite database.
-
-Browser-based dashboard served by a Node.js HTTP server.
-
-Technologies Used
-
-JavaScript (ES modules)
-
-Node.js
-
-SQLite
-
-HTML, CSS and JavaScript
-
-How to Run
-
-Requirement: Node.js 22.5 or later.
-
-Open a terminal in the stock trading project folder:
-
-cd codealpha_tasks/CodeAlpha_Stock_Trading_Platform
+Open a terminal in the stock trading project folder : cd codealpha_tasks/CodeAlpha_Stock_Trading_Platform
 npm start
 
-Then open the following address in your browser:
-
-http://localhost:3000
+Then open the following address in your browser : http://localhost:3000
 
 The SQLite database is created in the project's data directory when the application starts.
 
-Note: This is a stock-trading simulator. It uses simulated market prices and virtual balances; it is not connected to a real stock exchange and does not place real trades.
+<h3>Requirement: Node.js 22.5 or later versions.</h3>
 
-4. Student Grade Tracker
+<em>Note: This is a stock-trading simulator. It uses simulated market prices and virtual balances; it is not connected to a real stock exchange and does not place real trades.</em>
+
+<h2> 4. Student Grade Tracker </h2>
 
 Folder: codealpha_tasks/CodeAlpha_Student_Grade_Tracker/
 
-The Student Grade Tracker helps organise student marks and review academic performance. The project includes a Java console-based grade manager and a browser-based interface.
+<p>The Student Grade Tracker helps organise student marks and review academic performance. The project includes a Java console-based grade manager and a browser-based interface.</p>
 
-Key Features
+<h4>Key Features:</h4>
+<ul>
+  <li>Add students and record their scores.</li>
+  <li>Update a student's score or remove a student.</li>
+  <li>Validate scores within the range of 0 to 100 in the Java console application.</li>
+  <li>Calculate the class average, highest score, and lowest score.</li>
+  <li>Display a summary report of students and their scores.</li>
+  <li>Sort students alphabetically or by score.</li>
+  <li>Browser interface with grade summaries and a grading-scale display.</li>
+  <li>Responsive layout and light/dark theme options in the browser interface.</li>
+</ul>
 
-Add students and record their scores.
+<h4>Technologies Used:</h4>
+<ul>
+  <li>Java</li>
+  <li>ArrayList and Java Collections</li>
+  <li>HTML</li>
+  <li>CSS</li>
+  <li>JavaScript</li>
+</ul>
 
-Update a student's score or remove a student.
-
-Validate scores within the range of 0 to 100 in the Java console application.
-
-Calculate the class average, highest score, and lowest score.
-
-Display a summary report of students and their scores.
-
-Sort students alphabetically or by score.
-
-Browser interface with grade summaries and a grading-scale display.
-
-Responsive layout and light/dark theme options in the browser interface.
-
-Technologies Used
-
-Java
-
-ArrayList and Java Collections
-
-HTML
-
-CSS
-
-JavaScript
-
-How to Run
+<h4>How to Run:</h4>
 
 Option 1: Run the browser interface
-
 Open codealpha_tasks/CodeAlpha_Student_Grade_Tracker/index.html in a web browser.
 
 Option 2: Run the Java console application
-
 Open a terminal in the project folder:
 
 cd codealpha_tasks/CodeAlpha_Student_Grade_Tracker
 javac Student.java GradeManager.java
 java GradeManager
 
-Requirement for the Java version: Java Development Kit (JDK).
+<h3>Requirement for the Java version: Java Development Kit (JDK).</h3>

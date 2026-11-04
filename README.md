@@ -8,7 +8,7 @@ Projects Overview
 
 <h2> 1. Artificial Intelligence Chatbot </h2>
 
-<h5>Folder:</h5> codealpha_tasks/CodeAlpha_Artificial_Intelligence_Chatbot/
+<strong>Folder:</strong> codealpha_tasks/CodeAlpha_Artificial_Intelligence_Chatbot/
 
 <p> The Artificial Intelligence Chatbot is a Java-based conversational application designed to understand user questions and provide relevant responses using Natural Language Processing (NLP) techniques. </p>
 

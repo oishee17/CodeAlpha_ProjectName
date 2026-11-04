@@ -8,7 +8,7 @@ Projects Overview
 
 <h2> 1. Artificial Intelligence Chatbot </h2>
 
-Folder: codealpha_tasks/CodeAlpha_Artificial_Intelligence_Chatbot/
+<h5>Folder:</h5> codealpha_tasks/CodeAlpha_Artificial_Intelligence_Chatbot/
 
 <p> The Artificial Intelligence Chatbot is a Java-based conversational application designed to understand user questions and provide relevant responses using Natural Language Processing (NLP) techniques. </p>
 
@@ -35,14 +35,12 @@ Folder: codealpha_tasks/CodeAlpha_Artificial_Intelligence_Chatbot/
 </ul>
 
 <h4>How to Run:</h4>
-
-Open a terminal in the chatbot project folder : cd codealpha_tasks/CodeAlpha_Artificial_Intelligence_Chatbot
-Compile the Java source files : bash build.sh
-Start the chatbot : java -cp out chatbot.Main
-Open http://localhost : 8080 in your browser.
+<h5>Open a terminal in the chatbot project folder :</h5> cd codealpha_tasks/CodeAlpha_Artificial_Intelligence_Chatbot <br>
+<h5>Compile the Java source files :</h5> bash build.sh <br>
+<h5>Start the chatbot :</h5> java -cp out chatbot.Main <br>
+<h5>Open http://localhost :</h5> 8080 in your browser.
 
 <h4>Other available commands:</h4>
-
 java -cp out chatbot.Main --train <br>
 java -cp out chatbot.Main --ask "your question here" <br>
 java -cp out chatbot.Main --selftest <br>
@@ -52,7 +50,7 @@ java -cp out chatbot.Main --port 9090
 
 <h2> 2. Hotel Reservation System </h2>
 
-Folder: codealpha_tasks/CodeAlpha_Hotel_Reservation/
+<h5>Folder:</h5> codealpha_tasks/CodeAlpha_Hotel_Reservation/
 
 <p>The Hotel Reservation System is a Python application that simulates the reservation process of a hotel. Users can search for available rooms, make bookings, view reservation details, and cancel reservations.</p>
 
@@ -78,13 +76,12 @@ Folder: codealpha_tasks/CodeAlpha_Hotel_Reservation/
 </ul>
 
 <h4>How to Run:</h4>
-
-Open a terminal in the hotel reservation project folder : cd codealpha_tasks/CodeAlpha_Hotel_Reservation <br>
+<h5>Open a terminal in the hotel reservation project folder :</h5> cd codealpha_tasks/CodeAlpha_Hotel_Reservation <br>
 python main.py
 
 The application opens an interactive console menu. On its first run, it creates the demo room inventory in the data directory.
 
-To run the test suite : python -m unittest discover -s tests -v
+<h5>To run the test suite :</h5> python -m unittest discover -s tests -v
 
 <h3>Requirement: Python 3.10 or later. No third-party Python packages are required.</h3>
 
@@ -92,7 +89,7 @@ To run the test suite : python -m unittest discover -s tests -v
 
 <h2> 3. Stock Trading Platform </h2>
 
-Folder: codealpha_tasks/CodeAlpha_Stock_Trading_Platform/
+<h5>Folder:</h5> codealpha_tasks/CodeAlpha_Stock_Trading_Platform/
 
 <p>The Stock Trading Platform is a web-based stock-market simulation. Users can create trading accounts, buy and sell shares using virtual cash, and track their portfolios as simulated stock prices change over time.</p>
 
@@ -119,8 +116,7 @@ Folder: codealpha_tasks/CodeAlpha_Stock_Trading_Platform/
 </ul>
 
 <h4>How to Run:</h4>
-
-Open a terminal in the stock trading project folder : cd codealpha_tasks/CodeAlpha_Stock_Trading_Platform
+<h5>Open a terminal in the stock trading project folder :</h5> cd codealpha_tasks/CodeAlpha_Stock_Trading_Platform <br>
 npm start
 
 Then open the following address in your browser : http://localhost:3000
@@ -133,7 +129,7 @@ The SQLite database is created in the project's data directory when the applicat
 
 <h2> 4. Student Grade Tracker </h2>
 
-Folder: codealpha_tasks/CodeAlpha_Student_Grade_Tracker/
+<h5>Folder:</h5> codealpha_tasks/CodeAlpha_Student_Grade_Tracker/
 
 <p>The Student Grade Tracker helps organise student marks and review academic performance. The project includes a Java console-based grade manager and a browser-based interface.</p>
 
@@ -153,21 +149,17 @@ Folder: codealpha_tasks/CodeAlpha_Student_Grade_Tracker/
 <ul>
   <li>Java</li>
   <li>ArrayList and Java Collections</li>
-  <li>HTML</li>
-  <li>CSS</li>
-  <li>JavaScript</li>
+  <li>HTML, CSS and JavaScript</li>
 </ul>
 
 <h4>How to Run:</h4>
-
-Option 1: Run the browser interface
+<h5>Option 1: Run the browser interface</h5>
 Open codealpha_tasks/CodeAlpha_Student_Grade_Tracker/index.html in a web browser.
 
-Option 2: Run the Java console application
-Open a terminal in the project folder:
-
-cd codealpha_tasks/CodeAlpha_Student_Grade_Tracker
-javac Student.java GradeManager.java
+<h5>Option 2: Run the Java console application</h5>
+Open a terminal in the project folder :
+cd codealpha_tasks/CodeAlpha_Student_Grade_Tracker <br>
+javac Student.java GradeManager.java <br>
 java GradeManager
 
 <h3>Requirement for the Java version: Java Development Kit (JDK).</h3>

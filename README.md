@@ -50,7 +50,7 @@ java -cp out chatbot.Main --port 9090
 
 <h2> 2. Hotel Reservation System </h2>
 
-<h5>Folder:</h5> codealpha_tasks/CodeAlpha_Hotel_Reservation/
+<strong>Folder:</strong> codealpha_tasks/CodeAlpha_Hotel_Reservation/
 
 <p>The Hotel Reservation System is a Python application that simulates the reservation process of a hotel. Users can search for available rooms, make bookings, view reservation details, and cancel reservations.</p>
 
@@ -89,7 +89,7 @@ The application opens an interactive console menu. On its first run, it creates 
 
 <h2> 3. Stock Trading Platform </h2>
 
-<h5>Folder:</h5> codealpha_tasks/CodeAlpha_Stock_Trading_Platform/
+<strong>Folder:</strong> codealpha_tasks/CodeAlpha_Stock_Trading_Platform/
 
 <p>The Stock Trading Platform is a web-based stock-market simulation. Users can create trading accounts, buy and sell shares using virtual cash, and track their portfolios as simulated stock prices change over time.</p>
 
@@ -129,7 +129,7 @@ The SQLite database is created in the project's data directory when the applicat
 
 <h2> 4. Student Grade Tracker </h2>
 
-<h5>Folder:</h5> codealpha_tasks/CodeAlpha_Student_Grade_Tracker/
+<strong>Folder:</strong> codealpha_tasks/CodeAlpha_Student_Grade_Tracker/
 
 <p>The Student Grade Tracker helps organise student marks and review academic performance. The project includes a Java console-based grade manager and a browser-based interface.</p>
 

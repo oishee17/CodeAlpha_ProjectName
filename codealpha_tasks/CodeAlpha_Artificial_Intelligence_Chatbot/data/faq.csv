@@ -1,0 +1,475 @@
+# Fenix FAQ corpus - tab separated: intent <TAB> question <TAB> answer
+# Lines starting with # are comments. Rows sharing an intent are extra training
+# examples for the same answer, which is how the Naive Bayes model learns.
+# Thirteen intents: bot, howitworks, orders, promotions, shipping, returns,
+# payments, account, support, product, technical, privacy and shopping.
+# Every question is also a training example for the Naive Bayes classifier.
+
+# ---- what the bot is ---------------------------------------------------
+bot	what is fenix	Fenix is a Java chatbot for interactive conversation. It combines rule-based patterns, a Naive Bayes classifier and TF-IDF retrieval over a trained FAQ corpus, and it serves its own web interface straight from the JDK.
+bot	what is this project	This project is a natural-language chatbot written in pure Java with no third-party dependencies. The NLP pipeline (tokenising, stop-word removal, Porter stemming, TF-IDF) feeds a machine-learning intent classifier and a rule engine.
+bot	who created you	I was written as a Java NLP demonstration: a rule engine, a trained FAQ knowledge base and a Naive Bayes classifier, all running on a single embedded HTTP server.
+bot	tell me about fenix	Fenix reads your question, turns it into stemmed TF-IDF vectors, compares it with every FAQ it knows, and falls back to a probabilistic intent classifier when the wording is unfamiliar.
+bot	what does your name mean	Fenix is named after the phoenix - the bot keeps learning new answers and comes back stronger every time you teach it something new.
+bot	why are you called fenix	Because, like the phoenix, I grow every time I am taught something new: every answer you add is retrained into my model.
+
+# ---- natural language processing ----------------------------------------
+howitworks	what is nlp	NLP stands for natural language processing. It is the branch of computer science that lets machines understand human text - tokenisation, stemming, vector space models and classifiers like the ones I use.
+howitworks	how do you understand me	I break your sentence into tokens, drop stop words, reduce each word to its stem with the Porter algorithm, and then match that against my knowledge base.
+howitworks	what is stemming	Stemming reduces words to their root form: running, runs and ran all collapse towards one stem, so I can match your wording to a differently worded FAQ.
+howitworks	who is the porter algorithm named after	Martin Porter published his suffix-stripping algorithm in 1980. I implement it to normalise questions before matching.
+howitworks	what is tf idf	TF-IDF weights a word by how often it appears in one document versus how rare it is across the whole corpus, so rare, distinctive words dominate the similarity score.
+howitworks	what is cosine similarity	Cosine similarity measures the angle between two vectors. I use it to score how close your question is to each stored FAQ question.
+howitworks	explain the pipeline	The pipeline is: normalise, tokenise, remove stop words, Porter-stem, build a TF-IDF vector, rank the corpus by cosine similarity, then decide with thresholds and the classifier.
+howitworks	how does the rule engine work	The rule engine runs first and uses regular expressions to catch deterministic conversations such as greetings, thanks, goodbyes, jokes and requests for the time.
+
+# ---- machine learning ---------------------------------------------------
+howitworks	what machine learning model do you use	A multinomial Naive Bayes classifier with Laplace smoothing. Each FAQ question is a training example and each intent is a class.
+howitworks	how were you trained	Every question in data/faq.csv was tokenised and stemmed, then used as a labelled example. Run --train to retrain and cross-validate the model.
+howitworks	what is naive bayes	Naive Bayes is a probabilistic classifier that assumes each word contributes independently to the class. It is small, fast and surprisingly good on text.
+howitworks	how confident are you	My confidence is the cosine score of the best match, blended with the classifier posterior when the classifier decides. Anything below the threshold makes me admit that I do not know.
+howitworks	can you learn new answers	Yes. When I answer with a fallback, the web interface offers a teach box. What you teach me is written to data/trained.csv and the model is retrained immediately.
+howitworks	how do i retrain the bot	Run java -cp out chatbot.Main --train. It cross-validates the classifier, prints the accuracy and writes model/naive-bayes.tsv.
+
+# ---- the web interface --------------------------------------------------
+howitworks	how do i open the chat interface	Start the bot with java -cp out chatbot.Main and open http://localhost:8080 in your browser. The interface updates in real time as you type.
+howitworks	what can i type here	Type any question you would ask a support bot - about shipping, returns, payments, accounts or the bot itself. You can also say hello, ask for a joke, or ask what time it is.
+howitworks	is this a real time chat	Yes. Every message is posted to the JSON API and rendered back instantly, with typing indicators, suggestion chips and a live confidence badge.
+howitworks	what happens when you do not know	I say so honestly, show the closest questions I do know, and offer to be taught the answer so the next person gets it right.
+howitworks	are there keyboard shortcuts	Press Enter to send, and click any suggestion chip to ask a stored question without typing it.
+
+# ---- shipping -----------------------------------------------------------
+shipping	how long does delivery take	Standard delivery takes 3-5 working days. Express delivery arrives in 1-2 working days if you order before 2pm.
+shipping	when will my order arrive	Orders placed before 2pm ship the same day. Standard shipping arrives in 3-5 working days, express in 1-2.
+shipping	do you ship internationally	Yes - we ship to over 40 countries. International delivery takes 7-10 working days and the cost is calculated at checkout.
+shipping	how much is shipping	Standard shipping is free over 40 currency units, otherwise 4.90. Express shipping is 9.90 regardless of order value.
+shipping	can i track my parcel	Yes. As soon as your order ships you receive a tracking link by email, and the same tracking is shown in your account under Orders.
+shipping	what is the delivery cost	Shipping is free above 40 currency units; below that it costs 4.90 for standard and 9.90 for express.
+shipping	do you deliver on weekends	Saturday delivery is available in most regions for an extra 3.50 and can be selected at checkout.
+
+# ---- returns and refunds ------------------------------------------------
+returns	how do i return an item	You have 30 days to return anything unused in its original packaging. Open Orders in your account, choose Return, and print the prepaid label.
+returns	can i get a refund	Yes - once we receive your return we refund the original payment method within 5 working days.
+returns	what is your refund policy	Refunds are issued to the original payment method within 5 working days of the warehouse receiving your return.
+returns	i want my money back	Open Orders in your account, start a return, send the item back with the prepaid label, and we refund you within 5 working days.
+returns	how long do refunds take	Refunds usually appear within 5 working days of us receiving your return; banks may take a little longer to post it.
+returns	can i exchange an item	Yes - start a return and choose Exchange in the same flow, and we will reserve the new size or colour for you.
+returns	do i have to pay for return shipping	No. Return labels are prepaid - you only pay if you choose an express courier.
+
+# ---- payments -----------------------------------------------------------
+payments	which payment methods do you accept	We accept Visa, Mastercard, American Express, PayPal, Apple Pay and Google Pay.
+payments	is my card safe	Yes - payments are processed over encrypted connections and we never store your full card number on our servers.
+payments	can i pay in instalments	Yes, orders above 50 currency units can be split into three interest-free instalments at checkout.
+payments	my payment failed	Failed payments are usually an expired card or a bank block. Try another card or PayPal - no money is taken until the payment succeeds.
+payments	do you accept paypal	Yes, PayPal is available at checkout alongside cards, Apple Pay and Google Pay.
+payments	why was my card declined	The most common reasons are insufficient funds, an expired card, or a bank fraud check. Try a different method or contact your bank.
+
+# ---- account ------------------------------------------------------------
+account	how do i create an account	Click Sign up in the top right, enter your email and a password, and confirm the link we email you.
+account	i forgot my password	Choose Forgot password on the sign-in page and we will email you a reset link that is valid for one hour.
+account	how do i change my email address	Open Account, then Profile, enter the new address and confirm it from the verification email we send.
+account	how do i delete my account	Go to Account, then Privacy, and choose Delete account. This permanently removes your profile and order history.
+account	how do i reset my password	Click Forgot password on the sign-in page and follow the emailed link to choose a new password.
+account	why do i need an account	An account keeps your addresses, order history and returns in one place and makes checkout much faster.
+
+# ---- support ------------------------------------------------------------
+support	how do i contact customer support	Our team answers by live chat and email from 9am to 6pm, Monday to Saturday. The average reply time is under two hours.
+support	what are your opening hours	Support is available 9am-6pm, Monday to Saturday, by chat and email.
+support	how do i use this chatbot	Ask a question in the box below and press Enter. If I do not know the answer, use the teach panel to teach me and I will remember it.
+support	how do i report a bug	Describe the problem here or email support with the steps you took, your browser and a screenshot - we reproduce and fix it.
+support	do you have a phone line	We do not offer phone support, but live chat and email are answered within two hours during opening hours.
+
+# ---- extra training examples (one per row, same intents) ----------------
+bot	what does this application do	It is a chatbot application: it accepts questions in the browser, runs them through an NLP pipeline and answers from a trained FAQ knowledge base.
+bot	tell me what fenix is all about	Fenix is a conversational demo built in Java - a rule engine, a TF-IDF retrieval index and a Naive Bayes intent classifier behind a real-time web chat UI.
+bot	which kind of software is fenix	Fenix is server-side Java software: a single process that embeds an HTTP server, the NLP pipeline and the machine-learning model.
+bot	summarize yourself in one sentence	I am a Java chatbot that understands questions with NLP and answers them from a trained FAQ corpus.
+bot	what makes fenix different from other bots	Everything runs locally in plain Java - no external NLP services, no cloud APIs, and you can inspect and retrain the whole model yourself.
+
+howitworks	how does the chat interface work	The page posts your message to the /api/chat JSON endpoint; the server runs the pipeline, returns the answer with its intent and confidence, and the page renders it instantly.
+howitworks	what happens when i send a message	Your text is tokenised, stripped of stop words and stemmed, matched against the corpus with TF-IDF, classified by Naive Bayes, then sent back as JSON.
+howitworks	which algorithms do you use	Porter stemming for suffix stripping, TF-IDF with cosine similarity for retrieval, and multinomial Naive Bayes for intent classification.
+howitworks	explain how you classify questions	The classifier scores each intent from the words in your question using smoothed word probabilities, then normalises the scores so the top intent shows a confidence.
+howitworks	what technology powers you	Pure Java 21 with the built-in HTTP server and no third-party libraries - the whole NLP stack is implemented in this project.
+howitworks	how does the learning feature work	When I answer with a fallback, the teach panel writes your question, answer and intent to data/trained.csv and immediately rebuilds the index and retrains the model.
+
+shipping	how fast is delivery	Standard delivery takes 3-5 working days and express takes 1-2 working days when you order before 2pm.
+shipping	do you have express shipping	Yes - express shipping arrives in 1-2 working days and costs 9.90 wherever you are.
+shipping	is delivery free	Delivery is free on orders above 40 currency units; below that standard shipping costs 4.90.
+shipping	when do you dispatch orders	Orders placed before 2pm are dispatched the same working day; later orders go out the next day.
+shipping	do you ship to my country	We ship to more than 40 countries, with international delivery in 7-10 working days.
+shipping	how will i know when it ships	We email you a tracking link the moment your parcel leaves the warehouse, and it also appears under Orders in your account.
+
+returns	can i send an item back	Yes - you have 30 days to send back anything unused in its original packaging using the prepaid label.
+returns	how do i get my money back	Start a return from Orders, send the item back, and we refund your original payment method within 5 working days of receiving it.
+returns	is returning free	Returns are free: the label in your account is prepaid, so you only pay if you pick an express courier.
+returns	how many days do i have to return	You have 30 days from delivery to start a return.
+returns	can i swap for a different size	Yes - choose Exchange instead of Return in the same flow and we will hold the new size for you.
+returns	what can i not return	For hygiene reasons underwear and pierced jewellery cannot be returned, and personalised items are only eligible if faulty.
+
+payments	what payment options are there	Visa, Mastercard, American Express, PayPal, Apple Pay and Google Pay are all accepted.
+payments	do you take apple pay	Yes, Apple Pay is available at checkout on supported devices.
+payments	can i pay with a credit card	Yes - we accept Visa, Mastercard and American Express credit cards.
+payments	is it safe to pay here	Payments run over encrypted connections and we never store your full card number on our servers.
+payments	my credit card will not work	Check the expiry date and available balance, then try another card or PayPal - nothing is charged until the payment succeeds.
+payments	which wallets do you support	Apple Pay, Google Pay and PayPal are supported alongside regular card payments.
+
+account	how can i sign up	Click Sign up, enter your email and a password, then confirm the link we email you.
+account	i cannot remember my password	Use Forgot password on the sign-in page and we will email a reset link valid for one hour.
+account	how do i update my email	Go to Account, then Profile, type the new address and confirm it from the verification email.
+account	can i remove my account	Yes - Account, then Privacy, then Delete account permanently removes your profile and order history.
+account	how do i log in	Enter your email and password on the sign-in page, or use the reset link if you have forgotten it.
+account	where do i change my details	All personal details live under Account - Profile for your email and address, Privacy for deletion.
+
+support	how can i reach the support team	Use the live chat or email us; both are answered from 9am to 6pm, Monday to Saturday.
+support	do you offer live chat	Yes, live chat is open 9am-6pm Monday to Saturday and is usually answered within two hours.
+support	how quickly do you reply	Most messages get a reply within two hours during opening hours.
+support	who can i speak to	The customer service team handles delivery, returns, payments and account questions - start with live chat.
+support	what are your customer service hours	We are open 9am to 6pm, Monday to Saturday.
+# ---- extra corpus: orders, promotions and broader coverage ----------
+orders	where is my order	Track your order under Orders in your account or follow the tracking link we emailed you when it shipped.
+orders	how do i track my order	Once the order ships we email you a tracking link, and the live status is always under Orders in your account.
+orders	can i cancel my order	Orders can be cancelled free of charge until they are dispatched - open Orders and choose Cancel. After dispatch, start a return instead.
+orders	how do i cancel an order	Open Orders, select the order and press Cancel. You can do this any time before the parcel leaves the warehouse.
+orders	can i change my order	If the order has not shipped you can change sizes, colours and quantities from the Orders page; otherwise place a new order and return the first.
+orders	can i change my delivery address	If the order has not shipped, open Orders and choose Edit address. Once it has shipped, the courier can redirect it for a small fee.
+orders	i did not receive a confirmation email	Check your spam folder first; if it is not there, the order may not have completed. Look under Orders in your account or contact support.
+orders	my order arrived damaged	Sorry about that - open Orders, choose Return, pick Damaged and attach a photo. You get a full refund or a replacement, and the label is prepaid.
+orders	i received the wrong item	We will fix that straight away. Start a return with reason Wrong item, and we ship the correct product immediately at no cost to you.
+orders	an item is missing from my parcel	Missing items are usually packed separately. If the tracking says delivered and the item still has not arrived within 24 hours, contact support.
+orders	can i order by phone	We do not take phone orders, but the website checkout is available 24/7 and support can help if anything goes wrong.
+orders	do you have a minimum order value	There is no minimum order value; standard shipping is simply free above 40 currency units.
+promotions	do you have discount codes	We run seasonal promotions and send promo codes to newsletter subscribers. Enter any valid code in the Discount box at checkout.
+promotions	how do i use a promo code	Type the code into the Discount field in your cart and press Apply - the saving shows before you pay.
+promotions	do you offer a student discount	Verified students get 10 percent off all year. Confirm your student status through the discount page and the saving applies automatically.
+promotions	do you have a loyalty program	Yes - every order earns points that convert into credit. Your balance and tier live under Account, then Rewards.
+promotions	do you sell gift cards	Digital gift cards are available in 10, 25, 50 and 100 currency units and arrive by email within minutes of purchase.
+promotions	when is your next sale	The biggest sale is end of season, with flash offers announced first to newsletter subscribers - subscribe so you do not miss it.
+promotions	do you have a referral program	Invite a friend and you both get 10 currency units of credit after their first order. Your invite link is under Account, then Rewards.
+promotions	can i combine discount codes	Only one promo code per order, but loyalty credit can be used on top of a code.
+shipping	do you deliver to a po box	Yes, standard delivery ships to PO boxes; express couriers cannot deliver to them, so choose standard at checkout.
+shipping	what happens if i am not home	The courier leaves a card with a reschedule link, or you can change the delivery day from the tracking page.
+shipping	can i pick up my order myself	Click and collect is free from our central store - choose Pickup at checkout and wait for the ready-for-collection email.
+shipping	do you deliver on sunday	Sunday delivery is available in selected areas for express orders placed before noon on Saturday.
+shipping	is international shipping free	International orders above 150 currency units ship free; below that a flat 12.90 applies and duties are calculated at checkout.
+shipping	how do i know when my order has shipped	We email a tracking link the moment the parcel leaves the warehouse, and the status flips to Shipped under Orders.
+returns	can i return something after 30 days	Outside the 30-day window we can only accept faulty items; contact support and we will still look at it case by case.
+returns	my item does not fit can i return it	Yes - start a return from Orders, choose Wrong size, and use the prepaid label. Exchanges are reserved as soon as you request one.
+returns	where is my refund	Once we scan your return, the refund is released to your original payment method within 5 working days - check the status under Orders, then Returns.
+returns	can i return to a store	Yes, any store will take back an unused item with its receipt or the order email, and the refund goes back to your card.
+returns	do i need the original packaging	Items should be unused and in their original box so they are protected in transit; accessories and tags must be included.
+returns	what if the item is faulty	Faulty items are covered for 24 months - choose Faulty when starting the return and we cover the postage both ways.
+payments	when am i charged	Your card is authorised when you order and charged only when the parcel is dispatched.
+payments	can i get a receipt	A printable invoice is attached to your order email and always available under Account, then Orders, then Invoices.
+payments	do you accept cryptocurrency	We do not accept crypto at the moment; cards, PayPal, Apple Pay and Google Pay are all supported.
+payments	can i pay with two cards	Split payments are not supported, but you can use store credit together with one card at checkout.
+payments	do you accept gift cards	Gift card codes can be entered in the Discount field and applied against the order total, including shipping.
+payments	why is my payment still pending	Pending usually means your bank is verifying the transaction. It clears within a few minutes - if it persists, contact your bank.
+account	how do i change my password	Go to Account, then Security, choose Change password, enter your current password and pick a new one of at least 8 characters.
+account	how do i turn on two factor authentication	Open Account, then Security, enable Two-factor authentication and scan the QR code with an authenticator app.
+account	i did not get the verification email	Wait a minute, check spam, then use Resend from the sign-up page. If it still fails, support can verify you manually.
+account	can i have two accounts	Yes, as long as each uses a different email address; orders cannot be merged between accounts.
+account	how do i stop your marketing emails	Unsubscribe from any email footer link, or switch off marketing messages under Account, then Notifications.
+account	is my personal data safe	We only store what is needed to fulfil orders, encrypt it in transit and at rest, and never sell data to third parties.
+support	how do i file a complaint	Send it by live chat or email - we acknowledge within one working day and give a full written reply within five.
+support	can i speak to a manager	Ask for an escalation in the chat and a senior agent will take over the conversation the same working day.
+support	which languages do you support	The website and support are available in English; the bot currently answers in English only.
+support	do you have an faq page	This chat is the FAQ - ask anything, or browse the suggestion chips above the message box for common topics.
+support	how do i cancel my subscription	Subscriptions can be paused or cancelled under Account, then Subscriptions - it takes effect at the end of the paid period.
+howitworks	what is a stop word	Stop words are common function words like the, is and at. I remove them before matching because they appear in nearly every document.
+howitworks	what is laplace smoothing	Laplace smoothing adds a small pseudo-count to every word so a word never seen for an intent does not wipe out the whole probability.
+howitworks	do you use deep learning	No - the model is a classic multinomial Naive Bayes classifier plus TF-IDF retrieval, which is transparent and trains in milliseconds.
+howitworks	do you call any external services	Nothing leaves this machine: the NLP pipeline, the classifier, the knowledge base and the web server all run inside one Java process.
+howitworks	how much training data do you have	The corpus holds well over a hundred FAQ questions across nine intents, and each question doubles as a training example for the classifier.
+howitworks	what happens when i ask something you do not know	Retrieval scores every FAQ against your question; if nothing clears the threshold I say so and offer the teach panel so the answer is learned.
+howitworks	how do you measure how sure you are	Confidence combines the cosine similarity of the best match with the classifier posterior, and anything under the threshold falls back to I do not know.
+howitworks	what is a vector space model	Each question becomes a vector of TF-IDF weights; the closer two vectors point, the more similar their meaning - that is what I rank with.
+bot	are you a real person	No - I am a program. I understand your wording with an NLP pipeline and answer from a trained FAQ corpus.
+bot	are you human	I am software, not a human, but I do my best to be useful: rules, a classifier and retrieval decide every answer.
+bot	what language are you written in	Pure Java 21 with no third-party libraries - even the HTTP server and the JSON handling are hand written.
+bot	what can you help me with	Ask about shipping, returns, payments, your account, orders, promotions, or how this chatbot itself works.
+bot	do you understand me	Yes - your text is normalised, tokenised, de-stop-worded and Porter-stemmed before it is matched against my corpus.
+bot	how many languages do you speak	English only for now, though the NLP pipeline is written so another language could be added with a new stop list and stemmer.
+# ---- paraphrase coverage for known weak spots ------------------------
+orders	my parcel has not arrived	Your parcel is late - open Orders and check the tracking page first. If it has been more than 48 hours since the delivery window, contact support and we reship or refund.
+orders	my parcel says delivered but i do not have it	Tracking sometimes updates early. Wait a few hours, check with neighbours and any safe place, then contact support and we investigate with the courier.
+orders	i have not received my parcel	Look at the tracking link in your dispatch email; if the delivery window has passed, support will reship or refund you the same day.
+payments	do you take crypto	We accept cards, PayPal, Apple Pay and Google Pay - cryptocurrency is not supported at the moment.
+payments	do you accept bitcoin	No bitcoin yet; the supported methods are Visa, Mastercard, American Express, PayPal, Apple Pay and Google Pay.
+payments	which coins do you accept	We do not take cryptocurrencies. Pay by card, PayPal, Apple Pay or Google Pay instead.
+support	nobody replied to my email	Emails are answered within two hours during opening hours, 9am-6pm Monday to Saturday - nudge us by live chat if it has been longer.
+support	i have been waiting for a reply	Sorry about the wait - live chat is the fastest route and we usually reply within two hours in opening hours.
+returns	can i send something back late	After 30 days we can still help if the item is faulty; otherwise contact support and we will see what is possible.
+account	i lost my password	Choose Forgot password on the sign-in page and we email a reset link that is valid for one hour.
+promotions	any discount for students	Verified students get 10 percent off all year - confirm through the discount page and it applies automatically.
+promotions	is there a black friday sale	Our end-of-season and Black Friday offers are announced first to newsletter subscribers, so sign up to hear about them.
+# ---- second round of paraphrases from API spot-checks ----------------
+support	i have not heard back	We reply within two hours during opening hours (9am-6pm, Monday to Saturday). Nudge us on live chat and we will pick your case up straight away.
+support	my email has not been answered	Sorry for the wait - live chat reaches us fastest and we usually answer within two hours in opening hours.
+returns	can i still get a refund after 30 days	After 30 days we only refund faulty items - contact support and we will look at your case.
+orders	how do i know when my parcel will come	Dispatch emails carry the tracking link and the estimated delivery window; standard parcels arrive in 3-5 working days, express in 1-2.
+# ---- new intent: product -------------------------------------------------
+product	what sizes do you have	Every product page lists its full size run, from XXS to 3XL, with a size guide showing chest, waist and hip measurements in units and inches.
+product	do you have a size guide	Yes - the size guide sits next to the size picker on every product page, with measurements for each size and advice on between sizes.
+product	which size should i order	If you are between sizes we suggest the larger one for knitwear and the smaller one for shirts; the product page notes the fit on the model.
+product	is this item true to size	Product pages carry fit notes from customers; anything running small or large is flagged in the reviews section.
+product	will this item come back in stock	We restock popular items every few weeks - tap Notify me on the product page and we will email you the moment it returns.
+product	do you restock sold out items	Good items come back: restocks usually land within four to six weeks, and notify-me emails go out first.
+product	could you get a brand for me	We add new brands each season; suggest one through support and the buying team will consider it for the next range.
+product	are your products genuine	Everything is sourced directly from brands or their official distributors, and authenticity is guaranteed on every item.
+product	what are your clothes made of	Fabric content is listed in the Materials tab on each product page, alongside care instructions.
+product	how do i wash this item	Care labels and washing instructions appear on the product page and on the garment tag; when in doubt wash cold and air dry.
+product	do you have gift wrapping	Yes - gift wrapping can be added at checkout for a small fee, and the receipt is never included in the parcel.
+product	can i get a price match	Found it cheaper elsewhere within seven days of your order? Send support the link and we refund the difference.
+product	why is the price different now	Prices move with season and stock. If you bought within the last seven days and it dropped, support refunds the difference.
+product	do your prices include tax	Prices shown include sales tax; for international orders any import duties are calculated at checkout.
+product	are the reviews from real customers	Reviews come only from customers who bought the item, and verified purchases are labelled as such.
+product	can i see it in a store	Items ordered for click and collect can be reserved from any store; stock levels per store are shown on the product page.
+product	do you have a wishlist	Yes - tap the heart on any product to save it to your wishlist, and we will tell you when it drops in price or restocks.
+product	how do i know if an item is in stock	Stock is shown next to the size picker; if your size is missing, use Notify me and you will get an email on restock.
+
+# ---- new intent: technical ----------------------------------------------
+technical	the website is not working	Try a hard refresh first and disable any ad blocker on our pages; if it still fails, tell support which page and browser you use.
+technical	i see an error message	Screenshot the error and send it to support with the page address - most errors are fixed within a working day.
+technical	the page is loading slowly	Check your connection, then try a different browser; if the whole site is slow, our status page shows any ongoing incident.
+technical	which browsers do you support	The site works on current versions of Chrome, Firefox, Safari and Edge, on desktop and mobile.
+technical	is there a mobile app	There is no app yet - the site is fully responsive, so add it to your home screen for an app-like experience.
+technical	the checkout is broken	Try a private window, which disables extensions that often break checkout; otherwise support can place the order for you.
+technical	i am getting a captcha	Complete the captcha once and it should not appear again for a while; if it loops, disable VPN or extensions and retry.
+technical	the site keeps logging me out	Sessions end after inactivity for security - tick Remember me at sign-in, and check that cookies are enabled.
+technical	are cookies used	Yes - essential cookies keep your cart and session working, and optional analytics cookies can be switched off in the footer settings.
+technical	the images are not loading	Images loading slowly usually means a slow connection; switch to a faster network or a different browser.
+technical	i cannot upload a photo	Attachments must be under 10 MB in jpg or png format - resize the photo and try again.
+technical	how do i clear my browser cache	Open your browser settings, find Clear browsing data and clear cached images and files, then reload the site.
+technical	is the site accessible	The site follows accessibility guidelines: keyboard navigation, screen-reader labels and resizable text are all supported.
+technical	the site looks broken	Try zooming to 100 percent and a modern browser; if the layout is still wrong, send support a screenshot.
+technical	i think my account was hacked	Change your password immediately, enable two-factor authentication, and contact support so we review recent activity.
+
+# ---- shipping extras -----------------------------------------------------
+shipping	do you deliver to ireland	Yes, Ireland is served by our standard 3-5 day service and express 1-2 day service.
+shipping	do you deliver to europe	We ship across Europe in 3-5 working days; duties are prepaid so nothing extra is charged on delivery.
+shipping	do you deliver to the usa	US delivery takes 5-8 working days and duties are calculated at checkout so there are no surprises.
+shipping	can i get same day delivery	Same-day delivery is available in central city areas for orders placed before 11am on working days.
+shipping	is saturday delivery free	Saturday delivery costs 3.50 and can be chosen at checkout where it is offered.
+shipping	do you deliver at night	Evening delivery between 6pm and 10pm is offered by the express courier in most regions.
+shipping	can i choose a delivery slot	Yes - after dispatch the tracking page lets you pick a day and a two-hour slot.
+shipping	how long do i have to collect from a store	Click and collect orders are held for 14 days; we email you when the parcel is ready.
+shipping	do you deliver to work addresses	Yes - add your workplace as the delivery address and note any receiving hours in the instructions box.
+shipping	do you leave parcels with a neighbour	Where the courier allows it, a neighbour or a safe place can be chosen on the tracking page before delivery.
+shipping	what if my parcel is lost	In the rare case a parcel goes missing in transit, support refunds or reships it within one working day of the claim.
+shipping	do you deliver to the highlands	Yes, though the Highlands and Islands use a two-day service with a small surcharge shown at checkout.
+shipping	can i collect from a locker	Parcel lockers are offered by the courier at checkout in areas where they are available, with a code sent by SMS.
+shipping	do you ship on bank holidays	Orders placed on bank holidays are dispatched the next working day.
+shipping	how is delivery cost calculated	Delivery is free above 40 currency units, otherwise 4.90 standard and 9.90 express, with surcharges only for remote areas.
+
+# ---- returns extras ------------------------------------------------------
+returns	can i return an online order in store	Yes, bring the item with its order email or receipt to any store and the refund goes back to your card.
+returns	who pays for the return	The prepaid label in your account covers standard returns; you only pay if you choose an express courier.
+returns	can i return a sale item	Sale items follow the same 30-day policy as everything else, provided they are unused with tags attached.
+returns	can i return part of an order	Yes - return any line from the order and keep the rest; the refund covers only what you send back.
+returns	what if i lost my receipt	The order email or your account order history is enough - no paper receipt needed.
+returns	can i return an item as a gift	Gift recipients can return for a gift card, and the original buyer is not notified.
+returns	how do i return a gift	Gift orders can be returned by the recipient for a gift card of the same value using the return label we email.
+returns	do you refund shipping costs	Shipping is refunded only when the whole order is returned because of our error, such as a faulty item.
+returns	what happens if i return it late	Returns after 30 days are accepted only for faulty goods; contact support first so we can authorise it.
+returns	can i return opened items	Sealed items such as cosmetics can be returned opened only if faulty; everything else must be unused.
+returns	do i need a return code	Start the return from Orders and the label carries the code; there is nothing else to print.
+returns	how will i know you got my return	We email you as soon as the warehouse scans your parcel, and the refund follows within five working days.
+returns	can i return across borders	Yes - the prepaid label works internationally and returns are free within 30 days of delivery.
+# ---- payments extras -----------------------------------------------------
+payments	do you accept visa	Yes, Visa debit and credit cards are both accepted.
+payments	do you accept mastercard	Yes, Mastercard including Maestro is supported at checkout.
+payments	do you take amex	American Express is accepted alongside the other major cards.
+payments	do you take google pay	Yes, Google Pay is available on Android and in supported browsers.
+payments	can i pay with apple pay	Apple Pay appears as a payment option on supported Apple devices at checkout.
+payments	do you take bank transfer	We do not accept direct bank transfer; card and wallet payments settle instantly.
+payments	do you take cash on delivery	Cash on delivery is not offered, but the courier accepts card payment on delivery in some regions.
+payments	what is buy now pay later	Buy now pay later splits your order into instalments with the provider, subject to a soft credit check.
+payments	can i pay in another currency	Prices are shown in your local currency at checkout where we support it; your bank applies its own conversion rate.
+payments	why is my payment pending	A pending charge is an authorisation - it is released or captured when the order dispatches, usually within a day.
+payments	is my payment secure	Payments run over encrypted connections with fraud screening, and we never store your full card number.
+payments	how do i get a refund for a cancelled order	Cancelled orders are refunded to the original payment method within three working days.
+payments	can i change my payment method	Before dispatch you can cancel and re-order with a different method; after dispatch the original method is used for any refund.
+payments	do you charge a handling fee	There are no handling or hidden fees - the total at checkout is the final price.
+
+# ---- account extras ------------------------------------------------------
+account	how do i verify my email	We send a verification link when you sign up - click it within 24 hours, or request a new one from the sign-in page.
+account	how do i change my phone number	Open Account, then Profile, edit the number and confirm the code we text you.
+account	can i change my username	Your display name can be edited any time under Account, then Profile.
+account	how do i change my language	Pick your language from the footer selector; it is remembered on this device.
+account	how do i change my currency	The currency selector in the footer switches prices; your address determines the default.
+account	can i hide my orders	Order history is private to your account; nothing is shared publicly unless you write a review.
+account	how do i download my data	Send a data request to support and we email an export of your profile and order history within 30 days.
+account	how do i unsubscribe	Every marketing email has an unsubscribe link at the bottom, and you can switch all marketing off under Notifications.
+account	why was my account locked	Accounts lock after several failed sign-in attempts for your security - wait 15 minutes or reset your password.
+account	can i merge two accounts	Accounts cannot be merged, but support can move your orders into the account you use most.
+account	how do i delete the app data	Reinstalling the app or clearing site data in your browser removes local data; your account data stays until you delete the account.
+account	can i set a billing address different from delivery	Yes - at checkout choose Use a different billing address, which must match what your bank has on file.
+account	how do i close my account permanently	Account, then Privacy, then Delete account removes your profile and order history permanently and cannot be undone.
+account	what happens to my data when i delete my account	Deletion removes your profile and history; invoices are kept only as long as tax law requires, then purged.
+account	can i have a business account	Business accounts with invoicing are available - apply through support and we enable VAT invoicing on your orders.
+
+# ---- support extras ------------------------------------------------------
+support	how do i contact you	Live chat and email are both open 9am to 6pm, Monday to Saturday.
+support	what is your email address	Email support through the contact form on the help page, or use the live chat for the fastest reply.
+support	do you have a help centre	The help centre holds articles on delivery, returns and accounts - but this chat answers most of the same questions.
+support	how do i give feedback	We read every piece of feedback - send it by chat or email and the product team reviews it weekly.
+support	do you have a complaints policy	Yes - complaints are acknowledged within one working day and answered in writing within five.
+support	who regulates you	We follow consumer law in our home market, which gives you statutory rights on top of our own policy.
+support	do you offer accessibility support	Yes - tell us what you need and we will help place orders, arrange deliveries and provide information in another format.
+support	can i book a callback	We do not offer callbacks, but chat replies usually arrive within two hours.
+support	do you have stores	Our central store offers click and collect, and stock from it can be reserved online.
+support	how do i apply for a job	Send your CV through the careers page; the hiring team replies to every application within two weeks.
+support	do you have an affiliate program	Yes - affiliates earn commission on referred sales; apply through the partners page.
+support	how do i report a scam pretending to be you	Email support with the message and we will confirm whether it came from us; we never ask for passwords by email.
+support	do you do partnerships	Brand and content partnerships are handled by the marketing team - reach out through the contact form.
+
+# ---- orders extras -------------------------------------------------------
+orders	how do i place an order	Browse, add items to your bag, then checkout - you can pay as a guest or sign in to save your details.
+orders	can i order as a guest	Yes, guest checkout is available; you still get tracking and returns by order number.
+orders	how do i find my order number	It is in your confirmation email and under Orders in your account, in the format FN-123456.
+orders	can i order out of stock items	Out-of-stock items can be pre-ordered when a restock date is shown on the product page.
+orders	can i order by email	Orders are placed online; support can help you complete one by chat if anything is unclear.
+orders	why was my order cancelled	Orders are cancelled when payment fails or stock runs out - we email the reason and any charge is released.
+orders	can i add to my existing order	Add items by placing a new order; if the first has not shipped, support can sometimes combine them.
+orders	can i get an invoice	Yes - invoices live under Account, then Orders, and are attached to your dispatch email.
+orders	what does my order status mean	Processing means we are picking it, Shipped means it left the warehouse, and Delivered means the courier marked it complete.
+orders	can i order a gift card with my order	Gift cards are digital and delivered by email, so they do not need to be added to a physical order.
+orders	do you have an order limit	There is no order limit, but very large orders may be split into several parcels at no extra cost.
+orders	can i reserve an item	Items are not reserved until checkout; adding to the bag does not hold stock.
+
+# ---- promotions extras ---------------------------------------------------
+promotions	do you have a first order discount	New customers get 10 percent off their first order with the welcome code sent after sign-up.
+promotions	how do i get the welcome code	Sign up for the newsletter and the welcome code arrives in your inbox within a few minutes.
+promotions	are there black friday deals	Yes - Black Friday runs for a week with new offers each day, announced first to subscribers.
+promotions	do you have a summer sale	The summer sale starts in late June with markdowns of up to 50 percent across the range.
+promotions	do you have free shipping days	Free shipping days happen a few times a year and are announced by newsletter and on the home page.
+promotions	can i get a discount on my birthday	Birthday members get a gift in their birthday month - add the date under Account, then Rewards.
+promotions	do you have a newsletter discount	Subscribers get the welcome discount plus early access to sales.
+promotions	how do i enter a competition	Competitions are announced on the home page and by email; entries close at midnight on the closing date.
+promotions	are promotion codes stackable	Only one code per order, but store credit and gift cards can be combined with a code.
+promotions	do you have student nights	Student events happen a few times a year with extra discounts - watch your student inbox.
+# ---- howitworks extras ---------------------------------------------------
+howitworks	what files make up this project	The source lives in src/chatbot, the corpus in data/faq.csv, the trained model in model/, and the interface in web/index.html.
+howitworks	where is my data stored	The FAQ corpus is a tab separated text file and the classifier is a small TSV model - both sit next to the program and are easy to read.
+howitworks	can i run this offline	Yes. Everything runs on your machine with no internet connection and no external services.
+howitworks	what port does the server use	Port 8080 by default; start it with --port 9090 to use another one.
+howitworks	how do i start the bot	Run bash build.sh to compile, then java -cp out chatbot.Main to serve the web interface.
+howitworks	how do i start the server	java -cp out chatbot.Main starts the HTTP server on port 8080, and --port changes it. Build first with bash build.sh.
+howitworks	how do i retrain after editing the corpus	Just restart the bot - it fingerprints the corpus, notices the change and retrains automatically.
+howitworks	what is a training example	Each FAQ question, paired with its intent, is one labelled example the classifier learns from.
+howitworks	what is an intent	An intent is a topic class such as shipping or returns; the classifier predicts which topic your question belongs to.
+howitworks	how does the bot decide which answer to use	Exact wording wins first, then TF-IDF similarity, then the classifier restricted to its predicted intent, then a fallback.
+howitworks	what are the thresholds	High similarity answers directly; a weaker match only answers when the classifier agrees and the intent score clears the lower bar.
+howitworks	why do you sometimes say you do not know	When nothing scores above the threshold I would rather admit it than invent an answer - that is what the teach panel is for.
+howitworks	is the model saved between restarts	Yes, the classifier is written to model/naive-bayes.tsv and reloaded unless the corpus changed.
+howitworks	how big is the model	The model is a few hundred kilobytes of word probabilities - small enough to read as plain text.
+howitworks	can i reset the bot	Restarting restores the seeded corpus; anything you taught is stored separately in data/trained.csv, so delete that file to reset learning.
+howitworks	do you keep chat logs	Conversations are not stored; only the FAQ pairs you deliberately teach are written to disk.
+howitworks	how fast is a reply	The whole pipeline runs in milliseconds - tokenising, stemming, ranking a few hundred documents and classifying.
+howitworks	can it handle many users	Yes - the embedded server handles requests concurrently, and the model is read-only while serving.
+howitworks	how would i add a new intent	Append rows to data/faq.csv under a new intent name, restart, and the classifier learns it as another class.
+howitworks	how would i change an answer	Edit the answer in data/faq.csv and restart; the corpus fingerprint triggers a retrain.
+howitworks	what is the difference between rules and the classifier	Rules are exact regular expressions with guaranteed answers; the classifier is statistical and handles wording it has never seen.
+howitworks	why do rules run first	Deterministic matches such as greetings should never be second guessed by a probability.
+howitworks	how does the suggestion list work	Suggestions mix the closest stored questions with a sample of the corpus so you always see useful starter questions.
+howitworks	what happens to unknown questions	They return intent unknown with a fallback reply and an offer to be taught through the interface.
+howitworks	how do i see the bot statistics	The banner shows FAQ count, intents, vocabulary size and the state of the model; the API exposes the same at /api/stats.
+howitworks	which endpoints does the server expose	POST /api/chat, POST /api/train, GET /api/stats and GET /api/suggestions, plus the static interface at /.
+howitworks	is the api json	Yes - every response is JSON with reply, intent, confidence, method and suggestions.
+
+# ---- bot extras ----------------------------------------------------------
+bot	what is your personality	Friendly and direct: I answer, admit when I do not know, and never pad an answer with filler.
+bot	are you connected to chatgpt	No - I am not connected to any external model; every answer comes from this project's own code and corpus.
+bot	are you an llm	I am not a large language model. I combine regular expressions, TF-IDF retrieval and a Naive Bayes classifier.
+bot	what is your favourite thing about yourself	Being readable: you can open the source, see exactly why I answered the way I did, and retrain me in a second.
+bot	can you learn on your own	I learn when you teach me through the panel - I do not invent answers or browse the internet.
+bot	could you help me cheat on homework	I can explain concepts like Naive Bayes or stemming, but I will not do your assignments for you.
+bot	how old are you	I have existed since this project was compiled - age is not really my thing.
+bot	do you have feelings	No feelings, but I do have thresholds, and they tell me when to be honest about not knowing.
+bot	what is your favourite colour	Amber, clearly - it is the colour of every badge in this interface.
+bot	can you sing	I cannot sing, but I do keep a couple of jokes on file if you ask nicely.
+bot	tell me something interesting	Porter's stemming algorithm was published in 1980 and is still the backbone of many search engines today.
+bot	what is the meaning of life	That one is outside my training corpus. Try asking me about shipping instead.
+
+# ---- technical extras -----------------------------------------------------
+technical	the search does not find anything	Search works on the FAQ corpus - try fewer words, since stop words are removed before matching.
+technical	i cannot apply a filter	Filters need a selected category first; clear the current filter and pick a category from the sidebar.
+technical	the sort order is not working	Reloading the page fixes most sorting glitches; tell support if it repeats on a specific category.
+technical	emails are not arriving	Check spam and promotions folders, then add our sender address to your contacts; support can resend any message.
+technical	the newsletter sign up failed	Sign up again with the same address - if it is already subscribed we show a confirmation instead of an error.
+technical	i am not getting notifications	Allow notifications in your browser, and check that order updates are switched on under Account, then Notifications.
+technical	the site is not secure	Check that the address starts with https - if it does not, do not enter details and contact support immediately.
+technical	can i use a vpn with the site	Yes, though a VPN may occasionally trigger an extra captcha challenge.
+technical	the chat box is not showing	The chat needs JavaScript enabled; enable it in your browser settings and reload the page.
+technical	i cannot copy text from the page	Copying is limited on some content for copyright reasons - tell us if you need the text for accessibility.
+technical	the download will not start	Allow pop-ups for the site or try a different browser; downloads start automatically after checkout.
+technical	how do i print an invoice	Open the invoice from Orders and use your browser's print command; it is formatted for A4.
+technical	the page is blank after login	Try a hard refresh; if it persists, clear cookies for the site and sign in again.
+technical	are you down	Check the status link in the footer during incidents; otherwise try a hard refresh to rule out local caching.
+technical	can i use the site with javascript disabled	The interface needs JavaScript for the chat, but all shopping pages and checkout work without it.
+technical	why do i see two carts	Carts are stored per browser - sign in to sync your bag across devices.
+# ---- new intent: privacy -------------------------------------------------
+privacy	how do you use my data	We use your data only to fulfil orders, provide support and improve the site, and we never sell it.
+privacy	do you share my data with third parties	Payment and delivery partners get only what they need to complete your order; nobody else receives your details.
+privacy	what is your cookie policy	Essential cookies keep your cart and session working; analytics and marketing cookies are optional and can be declined in the footer settings.
+privacy	how do i delete my cookies	Clear site data in your browser settings, or use the cookie preferences link in the footer to withdraw consent.
+privacy	can i request a copy of my data	Support can export your profile and order history on request, delivered within 30 days.
+privacy	do you comply with gdpr	Yes - you can access, correct, export or delete your personal data at any time by contacting support.
+privacy	how do i opt out of analytics	Open the cookie preferences in the footer and switch analytics off; the choice is remembered.
+privacy	is my payment data stored	We never store full card numbers - payments are handled by certified processors who are compliant with PCI rules.
+privacy	how do you protect my information	Data is encrypted in transit and at rest, access is limited to staff who need it, and systems are reviewed regularly.
+privacy	do you use my data for advertising	Only if you opt in; marketing preferences live under Account, then Notifications and can be changed any time.
+privacy	what happens if there is a data breach	We notify affected customers and the regulator within the legal deadline and explain exactly what was involved.
+privacy	can i browse anonymously	Yes - you can shop as a guest without an account; cookies only remember your bag and preferences.
+privacy	do you track me across the web	Only if you allow marketing cookies; essential analytics stay on our own pages and are never sold.
+privacy	how do i contact the data protection officer	Email the privacy team through the contact form on the help page and they reply within 30 days.
+
+# ---- new intent: shopping ------------------------------------------------
+shopping	how do i add something to the bag	Pick your size and press Add to bag - the bag updates instantly in the header.
+shopping	how do i use the bag	Open the bag icon to review items, change quantities and head to checkout.
+shopping	can i save items for later	Yes - move an item to your wishlist with the heart icon, or leave it in the bag; both survive signing out if you are logged in.
+shopping	how do i apply a discount	Enter the code in the Discount field in your bag and press Apply before you pay.
+shopping	how do i know the total	The bag always shows item prices, delivery, any discount and the final total before you commit to paying.
+shopping	can i change quantities in the bag	Yes - adjust the quantity selector on each line; stock is re-checked at checkout.
+shopping	what if my size is not listed	Choose Notify me on the product page and we will email when that size returns to stock.
+shopping	how do i find a specific product	Use the search bar at the top; it matches product names and descriptions as you type.
+shopping	how do i filter results	Filter by size, colour, price and category in the sidebar, and sort by newest, price or popularity.
+shopping	how do i compare products	Open the category view with Compare enabled to see sizes, materials and prices side by side.
+shopping	can i shop by brand	Yes - the Brands menu lists every label we carry, with new arrivals flagged.
+shopping	how do i know a product is authentic	Everything is sourced from brands or official distributors, and authenticity is guaranteed.
+shopping	do you have new arrivals	The New In section refreshes weekly and is sorted by the day pieces land.
+shopping	can i see what is trending	The Best Sellers and Trending filters show what other customers are buying right now.
+shopping	how do i check delivery estimates	Delivery estimates appear on the product page and again at checkout once you enter your address.
+shopping	what if the item looks different in person	Colours can vary slightly between screens; if it really does not match, start a return within 30 days.
+
+# ---- extra paraphrases for the most common questions ---------------------
+bot	hello	Hi! Ask me anything about shipping, returns, payments, your account, orders, promotions - or how this chatbot works.
+bot	hi there	Hello - what would you like to know?
+bot	good morning	Good morning! What can I help you with today?
+bot	how are you	Running nicely, thanks for asking - what can I do for you?
+bot	bye	Goodbye! Come back any time you have a question.
+bot	thanks a lot	You are welcome - anything else you would like to know?
+shipping	how much does delivery cost	Delivery is free above 40 currency units, otherwise 4.90 standard and 9.90 express.
+returns	how do i send something back	Start a return from Orders, print the prepaid label and post it - refunds take five working days after receipt.
+account	i cannot log in	Check your email and password, or use Forgot password; if the account is locked, wait 15 minutes and try again.
+payments	what payment methods can i use	Visa, Mastercard, Amex, PayPal, Apple Pay and Google Pay are all supported.
+support	how can i talk to someone	Live chat and email are open 9am-6pm, Monday to Saturday, with replies usually inside two hours.
+orders	track my order	Tracking is on the dispatch email and under Orders in your account.
+howitworks	how do you work	Normalise, tokenise, remove stop words, Porter-stem, rank by TF-IDF cosine similarity, and let Naive Bayes break ties.
+# ---- final patch: phrasing gaps spotted in spot-checks ------------------
+technical	my browser keeps showing an error	Screenshot it and send it to support with the page address - most browser errors are fixed within a working day.
+technical	there is an error on the site	Tell us which page and browser you use; a hard refresh clears it in most cases.
+technical	the website keeps crashing	Try a private window and disable extensions; if it still crashes, support will look at the log with you.
+technical	i cannot get the page to load	Check your connection and try another browser; if every page fails, our status page will show an incident.
+technical	something is broken on the page	Send a screenshot to support - we reproduce, fix and deploy most visual bugs within a working day.
+promotions	do you have a new customer discount	Yes - new customers get 10 percent off the first order with the welcome code sent after signing up.
+promotions	is there a discount for new customers	The welcome code takes 10 percent off your first order; it arrives by email as soon as you subscribe.
+promotions	i am new here is there a discount	Welcome! Sign up for the newsletter and the 10 percent welcome code lands in your inbox within minutes.
+privacy	how do you protect my information	Data is encrypted in transit and at rest, access is limited to the staff who need it, and systems are reviewed regularly.
+product	what size should i buy	If you are between sizes take the larger for knitwear and the smaller for shirts; each product page notes how the model wears it.
+product	is there a guide for sizes	The size guide next to the size picker lists chest, waist and hip measurements for every size.
+shopping	how do i check out	Press Checkout in your bag, confirm your address and delivery choice, then pay by card, PayPal or a wallet.
+shopping	how do i pay	Pay by Visa, Mastercard, American Express, PayPal, Apple Pay or Google Pay at checkout.
+shopping	can i shop as a guest	Yes - guest checkout is available and you still receive tracking and can start returns with your order number.
+orders	i want to cancel my order	Open Orders and press Cancel while the order is still processing; after dispatch, start a return instead.

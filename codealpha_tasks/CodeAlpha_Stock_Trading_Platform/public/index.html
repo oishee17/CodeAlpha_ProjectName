@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stock Trading Simulator</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">◆</span>
+        <div>
+          <h1>Stock Trading Simulator</h1>
+          <p class="tagline">Live market · paper trading · SQLite-backed</p>
+        </div>
+      </div>
+
+      <div class="account-bar">
+        <label class="field-inline">
+          <span>Account</span>
+          <select id="user-select"></select>
+        </label>
+        <button id="new-user-btn" class="btn ghost" type="button">+ New account</button>
+        <div class="clock">
+          <span class="dot" id="live-dot"></span>
+          <span id="market-status">connecting…</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="summary" id="summary">
+      <div class="stat">
+        <span class="stat-label">Portfolio value</span>
+        <span class="stat-value" id="stat-total">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Cash available</span>
+        <span class="stat-value" id="stat-cash">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Positions value</span>
+        <span class="stat-value" id="stat-positions">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Total P&amp;L</span>
+        <span class="stat-value" id="stat-pnl">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Open positions</span>
+        <span class="stat-value" id="stat-open">—</span>
+      </div>
+    </section>
+
+    <main class="grid">
+      <section class="panel span-2">
+        <div class="panel-head">
+          <h2>Market</h2>
+          <span class="muted" id="market-updated">waiting for quotes…</span>
+        </div>
+        <div class="table-wrap">
+          <table id="market-table">
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th class="num">Price</th>
+                <th class="num">Change</th>
+                <th class="num">Day range</th>
+                <th>Trend</th>
+                <th class="num">Volume</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="market-body">
+              <tr><td colspan="8" class="empty">Loading market…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>Trade ticket</h2></div>
+        <form id="trade-form" class="trade-form">
+          <label>
+            <span>Symbol</span>
+            <select id="trade-symbol" name="symbol" required></select>
+          </label>
+
+          <div class="side-toggle" id="side-toggle">
+            <button type="button" class="side-btn active" data-side="BUY">Buy</button>
+            <button type="button" class="side-btn" data-side="SELL">Sell</button>
+          </div>
+
+          <label>
+            <span>Quantity</span>
+            <input id="trade-qty" name="quantity" type="number" min="1" step="1" value="10" required />
+          </label>
+
+          <div class="quote" id="trade-quote">
+            <div><span>Market price</span><strong id="quote-price">—</strong></div>
+            <div><span id="quote-label">Estimated cost</span><strong id="quote-total">—</strong></div>
+            <div><span>Position after trade</span><strong id="quote-position">—</strong></div>
+          </div>
+
+          <p class="trade-error" id="trade-error" hidden></p>
+          <button class="btn primary block" id="trade-submit" type="submit">Place buy order</button>
+        </form>
+      </section>
+
+      <section class="panel span-2">
+        <div class="panel-head">
+          <h2>Portfolio performance</h2>
+          <span class="muted" id="perf-range">value over time</span>
+        </div>
+        <canvas id="perf-chart" height="220"></canvas>
+        <div class="chart-legend">
+          <span><i class="swatch value"></i> Portfolio value</span>
+          <span><i class="swatch cash"></i> Cash</span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>Holdings</h2></div>
+        <div class="table-wrap">
+          <table id="holdings-table">
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th class="num">Qty</th>
+                <th class="num">Avg cost</th>
+                <th class="num">Value</th>
+                <th class="num">P&amp;L</th>
+              </tr>
+            </thead>
+            <tbody id="holdings-body">
+              <tr><td colspan="5" class="empty">No positions yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel span-3">
+        <div class="panel-head">
+          <h2>Transaction history</h2>
+          <span class="muted">newest first</span>
+        </div>
+        <div class="table-wrap tall">
+          <table id="txn-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Side</th>
+                <th>Symbol</th>
+                <th class="num">Qty</th>
+                <th class="num">Price</th>
+                <th class="num">Total</th>
+                <th class="num">Realized P&amp;L</th>
+              </tr>
+            </thead>
+            <tbody id="txn-body">
+              <tr><td colspan="7" class="empty">No trades yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" hidden></div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fenix - Java NLP Chatbot</title>
+<style>
+  :root {
+    --bg: #0f1220;
+    --panel: #161a2e;
+    --panel-2: #1d2240;
+    --line: #2a3057;
+    --text: #e8eaf6;
+    --muted: #9aa2cd;
+    --accent: #6c8cff;
+    --accent-2: #43d9a3;
+    --danger: #ff6b81;
+    --bubble-bot: #212748;
+    --bubble-user: linear-gradient(135deg, #5b7cfa, #7a5cf0);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: radial-gradient(1200px 600px at 10% -10%, #1b2145 0%, var(--bg) 55%);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 22px;
+    background: rgba(13, 16, 32, 0.85);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .logo {
+    width: 38px; height: 38px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: grid; place-items: center;
+    font-weight: 800; color: #0d1020; font-size: 18px;
+    box-shadow: 0 6px 20px rgba(108, 140, 255, 0.35);
+  }
+  .title { font-weight: 700; font-size: 17px; letter-spacing: .3px; }
+  .subtitle { font-size: 12px; color: var(--muted); }
+  .stats { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  .stat {
+    background: var(--panel-2); border: 1px solid var(--line);
+    padding: 5px 10px; border-radius: 999px; font-size: 12px; color: var(--muted);
+    white-space: nowrap;
+  }
+  .stat b { color: var(--text); font-weight: 600; }
+  main { flex: 1; display: flex; min-height: 0; }
+  .chat {
+    flex: 1; display: flex; flex-direction: column; min-width: 0;
+    max-width: 900px; margin: 0 auto; width: 100%;
+  }
+  #log {
+    flex: 1; overflow-y: auto; padding: 24px 20px 12px;
+    display: flex; flex-direction: column; gap: 14px;
+    scroll-behavior: smooth;
+  }
+  .msg { display: flex; gap: 10px; max-width: 82%; animation: pop .18s ease-out; }
+  @keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .avatar {
+    width: 30px; height: 30px; border-radius: 9px; flex: 0 0 30px;
+    display: grid; place-items: center; font-size: 13px; font-weight: 700;
+    background: var(--panel-2); border: 1px solid var(--line);
+  }
+  .msg.bot .avatar { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #0d1020; }
+  .bubble {
+    background: var(--bubble-bot); border: 1px solid var(--line);
+    padding: 11px 14px; border-radius: var(--radius); line-height: 1.5;
+    font-size: 14.5px; white-space: pre-wrap; word-break: break-word;
+  }
+  .msg.user .bubble {
+    background: var(--bubble-user); border-color: transparent; color: #fff;
+    border-bottom-right-radius: 5px;
+  }
+  .msg.bot .bubble { border-bottom-left-radius: 5px; }
+  .meta { display: flex; gap: 8px; align-items: center; margin-top: 7px; flex-wrap: wrap; }
+  .badge {
+    font-size: 10.5px; padding: 2px 8px; border-radius: 999px;
+    background: rgba(108, 140, 255, .16);
+    color: var(--accent); border: 1px solid rgba(108, 140, 255, .4);
+    text-transform: uppercase; letter-spacing: .6px;
+  }
+  .badge.ok { background: rgba(67, 217, 163, .14); color: var(--accent-2); border-color: rgba(67,217,163,.4); }
+  .badge.warn { background: rgba(255, 107, 129, .13); color: var(--danger); border-color: rgba(255,107,129,.4); }
+  .teach-link {
+    background: none; border: none; color: var(--accent); cursor: pointer;
+    font-size: 11.5px; padding: 0; text-decoration: underline;
+  }
+  .typing { display: inline-flex; gap: 4px; align-items: center; padding: 4px 2px; }
+  .typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: blink 1.2s infinite; }
+  .typing i:nth-child(2) { animation-delay: .2s; }
+  .typing i:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%, 60%, 100% { opacity: .25; } 30% { opacity: 1; } }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; padding: 4px 20px 8px; }
+  .chip {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
+    padding: 7px 13px; border-radius: 999px; font-size: 12.5px; cursor: pointer;
+    transition: .15s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+  .composer {
+    display: flex; gap: 10px; padding: 14px 20px 18px;
+    border-top: 1px solid var(--line); background: rgba(13, 16, 32, .6);
+  }
+  .composer input {
+    flex: 1; background: var(--panel-2); border: 1px solid var(--line);
+    color: var(--text); border-radius: 12px; padding: 13px 15px; font-size: 14.5px;
+    outline: none; transition: .15s;
+  }
+  .composer input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,140,255,.15); }
+  button.send {
+    background: var(--bubble-user); color: #fff; border: none; border-radius: 12px;
+    padding: 0 22px; font-size: 14.5px; font-weight: 600; cursor: pointer;
+    transition: .15s;
+  }
+  button.send:hover { filter: brightness(1.1); }
+  button.send:disabled { opacity: .5; cursor: not-allowed; }
+  aside {
+    width: 320px; border-left: 1px solid var(--line); background: rgba(15, 18, 36, .6);
+    padding: 20px; overflow-y: auto; display: none;
+  }
+  @media (min-width: 1100px) { aside { display: block; } }
+  aside h3 { margin: 0 0 6px; font-size: 14px; }
+  aside p { margin: 0 0 14px; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+  aside label { display: block; font-size: 11.5px; color: var(--muted); margin: 10px 0 4px; text-transform: uppercase; letter-spacing: .6px; }
+  aside textarea, aside input {
+    width: 100%; background: var(--panel-2); border: 1px solid var(--line);
+    color: var(--text); border-radius: 10px; padding: 9px 11px; font-size: 13.5px;
+    font-family: inherit; outline: none; resize: vertical;
+  }
+  aside textarea:focus, aside input:focus { border-color: var(--accent); }
+  aside button {
+    margin-top: 12px; width: 100%; background: var(--accent-2); color: #0d1020;
+    border: none; border-radius: 10px; padding: 10px; font-weight: 700;
+    font-size: 13.5px; cursor: pointer;
+  }
+  aside button:hover { filter: brightness(1.08); }
+  .intent-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .intent-list span {
+    font-size: 11px; background: var(--panel-2); border: 1px solid var(--line);
+    color: var(--muted); padding: 3px 8px; border-radius: 999px;
+  }
+  #toast {
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--accent-2); color: #0d1020; font-weight: 600;
+    padding: 11px 20px; border-radius: 999px; font-size: 13.5px;
+    opacity: 0; transition: .3s; z-index: 50; pointer-events: none;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">F</div>
+  <div>
+    <div class="title">Fenix</div>
+    <div class="subtitle">Java chatbot &middot; rules + Naive Bayes + TF-IDF retrieval</div>
+  </div>
+  <div class="stats" id="stats">
+    <div class="stat">FAQ <b id="sFaqs">-</b></div>
+    <div class="stat">Intents <b id="sIntents">-</b></div>
+    <div class="stat">Terms <b id="sVocab">-</b></div>
+    <div class="stat">Model <b id="sModel">-</b></div>
+  </div>
+</header>
+
+<main>
+  <section class="chat">
+    <div id="log"></div>
+    <div class="chips" id="chips"></div>
+    <form class="composer" id="form" autocomplete="off">
+      <input id="input" placeholder="Ask me anything... (Enter to send)" aria-label="Message">
+      <button class="send" id="send" type="submit">Send</button>
+    </form>
+  </section>
+
+  <aside>
+    <h3>Teach the bot</h3>
+    <p>If Fenix does not know an answer, write it here. The new pair is saved to
+       <code>data/trained.csv</code> and the classifier is retrained instantly.</p>
+    <form id="teachForm">
+      <label for="tQuestion">Question</label>
+      <input id="tQuestion" placeholder="e.g. Do you ship to Alaska?">
+      <label for="tAnswer">Answer</label>
+      <textarea id="tAnswer" rows="4" placeholder="The answer Fenix should give"></textarea>
+      <label for="tIntent">Intent (topic)</label>
+      <input id="tIntent" placeholder="e.g. shipping">
+      <button type="submit">Teach Fenix</button>
+    </form>
+    <h3 style="margin-top:22px">Known intents</h3>
+    <div class="intent-list" id="intents"></div>
+  </aside>
+</main>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  const log = document.getElementById('log');
+  const form = document.getElementById('form');
+  const input = document.getElementById('input');
+  const send = document.getElementById('send');
+  const chips = document.getElementById('chips');
+  let pendingQuestion = '';
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function timeNow() {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function scroll() { log.scrollTop = log.scrollHeight; }
+
+  function addMessage(role, text, meta) {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg ' + role;
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.textContent = role === 'user' ? 'Y' : 'F';
+    const col = document.createElement('div');
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    col.appendChild(bubble);
+
+    if (meta) {
+      const bar = document.createElement('div');
+      bar.className = 'meta';
+      const cls = meta.method === 'fallback' ? 'warn' : (meta.method === 'rule' ? 'ok' : '');
+      const badge = document.createElement('span');
+      badge.className = 'badge ' + cls;
+      badge.textContent = meta.method + ' · ' + meta.intent +
+        (meta.confidence > 0 ? ' · ' + Math.round(meta.confidence * 100) + '%' : '');
+      bar.appendChild(badge);
+
+      const stamp = document.createElement('span');
+      stamp.className = 'badge';
+      stamp.style.background = 'transparent';
+      stamp.style.border = 'none';
+      stamp.style.color = '#9aa2cd';
+      stamp.style.textTransform = 'none';
+      stamp.textContent = timeNow();
+      bar.appendChild(stamp);
+
+      if (meta.method === 'fallback') {
+        const teach = document.createElement('button');
+        teach.className = 'teach-link';
+        teach.type = 'button';
+        teach.textContent = 'Teach me this';
+        teach.onclick = () => {
+          document.getElementById('tQuestion').value = pendingQuestion || '';
+          document.getElementById('tAnswer').focus();
+          document.getElementById('teachForm').scrollIntoView({ behavior: 'smooth' });
+        };
+        bar.appendChild(teach);
+      }
+      col.appendChild(bar);
+    }
+
+    wrap.appendChild(avatar);
+    wrap.appendChild(col);
+    log.appendChild(wrap);
+    scroll();
+    return wrap;
+  }
+
+  function setChips(items) {
+    chips.innerHTML = '';
+    (items || []).slice(0, 5).forEach(q => {
+      const chip = document.createElement('button');
+      chip.className = 'chip';
+      chip.type = 'button';
+      chip.textContent = q;
+      chip.onclick = () => { input.value = q; form.requestSubmit(); };
+      chips.appendChild(chip);
+    });
+  }
+
+  function typingIndicator() {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg bot';
+    wrap.innerHTML = '<div class="avatar">F</div><div><div class="bubble">' +
+      '<span class="typing"><i></i><i></i><i></i></span></div></div>';
+    log.appendChild(wrap);
+    scroll();
+    return wrap;
+  }
+
+  function toast(text) {
+    const el = document.getElementById('toast');
+    el.textContent = text;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2600);
+  }
+
+  async function ask(message) {
+    pendingQuestion = message;
+    addMessage('user', message);
+    send.disabled = true;
+    const typing = typingIndicator();
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+      const data = await res.json();
+      typing.remove();
+      addMessage('bot', data.reply, data);
+      setChips(data.suggestions);
+      if (data.method === 'fallback') {
+        document.getElementById('tQuestion').value = message;
+      }
+    } catch (err) {
+      typing.remove();
+      addMessage('bot', 'I could not reach the Java backend. Is it still running? (' + err + ')', { method: 'error', intent: 'transport', confidence: 0 });
+    } finally {
+      send.disabled = false;
+      input.focus();
+    }
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const value = input.value.trim();
+    if (!value) return;
+    input.value = '';
+    ask(value);
+  });
+
+  document.getElementById('teachForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const payload = {
+      question: document.getElementById('tQuestion').value,
+      answer: document.getElementById('tAnswer').value,
+      intent: document.getElementById('tIntent').value
+    };
+    if (!payload.question.trim() || !payload.answer.trim()) {
+      toast('Give me both a question and an answer');
+      return;
+    }
+    const res = await fetch('/api/train', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('tAnswer').value = '';
+      document.getElementById('tIntent').value = '';
+      toast('Learned it - ' + data.faqs + ' FAQ entries now');
+      addMessage('bot', data.reply.reply, data.reply);
+      loadStats();
+    } else {
+      toast(data.reply ? data.reply.reply : 'Could not learn that');
+    }
+  });
+
+  async function loadStats() {
+    try {
+      const res = await fetch('/api/stats');
+      const s = await res.json();
+      document.getElementById('sFaqs').textContent = s.faqs;
+      document.getElementById('sIntents').textContent = s.intents;
+      document.getElementById('sVocab').textContent = s.vocabulary;
+      document.getElementById('sModel').textContent =
+        String(s.model).indexOf('loaded') === 0 ? 'on disk' : 'trained';
+      document.getElementById('sModel').title = s.model;
+    } catch (e) { /* backend not up yet */ }
+  }
+
+  async function loadSuggestions() {
+    try {
+      const res = await fetch('/api/suggestions');
+      const data = await res.json();
+      setChips(data.suggestions);
+      const box = document.getElementById('intents');
+      box.innerHTML = '';
+      (data.intents || []).forEach(name => {
+        const tag = document.createElement('span');
+        tag.textContent = name;
+        box.appendChild(tag);
+      });
+    } catch (e) { /* ignore */ }
+  }
+
+  addMessage('bot', 'Hello! I am Fenix, a Java chatbot. I combine a rule engine, a Naive Bayes ' +
+    'classifier and TF-IDF retrieval over a trained FAQ corpus. Ask me a question, or click a ' +
+    'suggestion below.', { method: 'rule', intent: 'greeting', confidence: 1 });
+  loadStats();
+  loadSuggestions();
+  input.focus();
+})();
+</script>
+</body>
+</html>

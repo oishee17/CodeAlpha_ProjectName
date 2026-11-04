@@ -1,0 +1,167 @@
+[
+  {
+    "number": "101",
+    "category": "Standard",
+    "floor": 1,
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Air conditioning",
+      "Private bathroom"
+    ],
+    "active": true
+  },
+  {
+    "number": "102",
+    "category": "Standard",
+    "floor": 1,
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Air conditioning",
+      "Private bathroom"
+    ],
+    "active": true
+  },
+  {
+    "number": "103",
+    "category": "Standard",
+    "floor": 1,
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Air conditioning",
+      "Private bathroom"
+    ],
+    "active": true
+  },
+  {
+    "number": "104",
+    "category": "Standard",
+    "floor": 1,
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Air conditioning",
+      "Private bathroom"
+    ],
+    "active": true
+  },
+  {
+    "number": "201",
+    "category": "Deluxe",
+    "floor": 2,
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Air conditioning",
+      "Private bathroom",
+      "King bed",
+      "Mini bar",
+      "City view"
+    ],
+    "active": true
+  },
+  {
+    "number": "202",
+    "category": "Deluxe",
+    "floor": 2,
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Air conditioning",
+      "Private bathroom",
+      "King bed",
+      "Mini bar",
+      "City view"
+    ],
+    "active": true
+  },
+  {
+    "number": "203",
+    "category": "Deluxe",
+    "floor": 2,
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Air conditioning",
+      "Private bathroom",
+      "King bed",
+      "Mini bar",
+      "City view"
+    ],
+    "active": true
+  },
+  {
+    "number": "301",
+    "category": "Deluxe",
+    "floor": 3,
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Air conditioning",
+      "Private bathroom",
+      "King bed",
+      "Mini bar",
+      "City view"
+    ],
+    "active": true
+  },
+  {
+    "number": "302",
+    "category": "Suite",
+    "floor": 3,
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Air conditioning",
+      "Private bathroom",
+      "King bed",
+      "Mini bar",
+      "City view",
+      "Living room",
+      "Bathtub",
+      "Balcony",
+      "Breakfast"
+    ],
+    "active": true
+  },
+  {
+    "number": "401",
+    "category": "Suite",
+    "floor": 4,
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Air conditioning",
+      "Private bathroom",
+      "King bed",
+      "Mini bar",
+      "City view",
+      "Living room",
+      "Bathtub",
+      "Balcony",
+      "Breakfast"
+    ],
+    "active": true
+  },
+  {
+    "number": "402",
+    "category": "Suite",
+    "floor": 4,
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Air conditioning",
+      "Private bathroom",
+      "King bed",
+      "Mini bar",
+      "City view",
+      "Living room",
+      "Bathtub",
+      "Balcony",
+      "Breakfast"
+    ],
+    "active": true
+  }
+]

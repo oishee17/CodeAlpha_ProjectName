@@ -1,0 +1,13 @@
+{
+  "name": "stock-trading-sim",
+  "version": "1.0.0",
+  "description": "A basic stock trading environment: live market data, buy/sell operations, portfolio tracking, SQLite persistence.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.5"
+  }
+}

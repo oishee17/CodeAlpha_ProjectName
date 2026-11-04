@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎓 Gradely</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg-2: #1e1b4b;
+    --panel: #1e293b;
+    --panel-hover: #24334d;
+    --border: #334155;
+    --border-strong: #475569;
+    --inset: #0f172a;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --good: #34d399;
+    --bad: #f87171;
+    --warn: #fbbf24;
+    --shadow: rgba(0, 0, 0, .35);
+    --btn-text: #0f172a;
+    --row-hover: rgba(56,189,248,.06);
+  }
+  html[data-theme="light"] {
+    --bg: #f1f5f9;
+    --bg-2: #e0e7ff;
+    --panel: #ffffff;
+    --panel-hover: #f8fafc;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --inset: #f8fafc;
+    --accent: #0284c7;
+    --accent2: #7c3aed;
+    --text: #0f172a;
+    --muted: #64748b;
+    --good: #059669;
+    --bad: #dc2626;
+    --warn: #d97706;
+    --shadow: rgba(15, 23, 42, .12);
+    --btn-text: #ffffff;
+    --row-hover: rgba(2,132,199,.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 16px;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 1.9rem; margin-bottom: 4px; }
+  .sub { color: var(--muted); margin-bottom: 24px; }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+    cursor: default;
+  }
+  .stat:hover {
+    background: var(--panel-hover);
+    border-color: var(--border-strong);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px var(--shadow);
+  }
+  .stat .label { color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; }
+  .stat .value { font-size: 1.6rem; font-weight: 700; margin-top: 6px; }
+  .stat.avg .value { color: var(--accent); }
+  .stat.high .value { color: var(--good); }
+  .stat.low .value { color: var(--warn); }
+  .stat.count .value { color: var(--accent2); }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .panel h2 { font-size: 1.05rem; margin-bottom: 14px; }
+  form { display: flex; gap: 10px; flex-wrap: wrap; }
+  input, select, button {
+    font: inherit;
+    border-radius: 8px;
+    border: 1px solid var(--border-strong);
+    background: var(--inset);
+    color: var(--text);
+    padding: 10px 14px;
+  }
+  input[type="number"] { width: 120px; }
+  button {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: var(--btn-text); font-weight: 700; cursor: pointer;
+  }
+  button:hover { filter: brightness(1.1); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; cursor: pointer; user-select: none; }
+  th:hover { color: var(--accent); }
+  td.score { font-weight: 700; }
+  .grade { display: inline-block; min-width: 28px; text-align: center; padding: 2px 8px; border-radius: 999px; font-weight: 700; font-size: .85rem; }
+  .A { background: rgba(52,211,153,.15); color: var(--good); }
+  .B { background: rgba(56,189,248,.15); color: var(--accent); }
+  .C { background: rgba(251,191,36,.15); color: var(--warn); }
+  .D { background: rgba(251,146,60,.15); color: #fb923c; }
+  .F { background: rgba(248,113,113,.15); color: var(--bad); }
+  .del { background: none; border: none; color: var(--bad); cursor: pointer; font-size: 1rem; padding: 4px 8px; }
+  .empty { color: var(--muted); text-align: center; padding: 24px; }
+
+  /* ----- Grading scale table ----- */
+  .scale-table {
+    max-width: 320px;
+  }
+  .scale-table td { font-variant-numeric: tabular-nums; color: var(--muted); }
+  .scale-table .scale-graded { width: 90px; }
+  .bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .bar > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+
+  /* ----- Summary report enhancements ----- */
+  .report-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(56,189,248,.12);
+    border: 1px solid rgba(56,189,248,.35);
+    color: var(--accent);
+    font-size: .75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  table { position: relative; }
+  thead th {
+    position: sticky;
+    top: 0;
+    background: var(--panel);
+    z-index: 1;
+    border-bottom: 2px solid var(--border-strong);
+  }
+  tbody tr { transition: background .15s ease; }
+  tbody tr:hover { background: var(--row-hover); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.name-cell { font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .slno {
+    min-width: 30px; flex: 0 0 30px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    font-size: .8rem; font-weight: 700; color: var(--muted);
+    background: var(--inset);
+    border: 1px solid var(--border-strong);
+  }
+  .report-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 2px solid var(--border-strong);
+    color: var(--muted);
+    font-size: .9rem;
+  }
+  .report-foot strong { color: var(--text); }
+  .distribution { display: flex; gap: 8px; flex-wrap: wrap; }
+  .dist-chip {
+    font-weight: 700;
+    display: inline-flex;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: .8rem;
+  }
+  .dist-chip small { font-weight: 400; opacity: .85; }
+
+  /* ----- Responsive layout ----- */
+  @media (max-width: 640px) {
+    body { padding: 20px 10px; }
+    h1 { font-size: 1.4rem; }
+    .sub { font-size: .9rem; }
+    .stats { grid-template-columns: repeat(2, 1fr); margin-bottom: 18px; }
+    .stat .value { font-size: 1.25rem; }
+    .panel { padding: 16px 12px; }
+    form { flex-direction: column; }
+    input, button { width: 100%; }
+    input[type="number"] { width: 100%; }
+    /* collapse table into cards */
+    table, thead, tbody, tr, td { display: block; width: 100%; }
+    thead { display: none; }
+    tbody tr {
+      background: var(--inset);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+    }
+    td { border-bottom: none; padding: 0; }
+    td.name-cell { grid-column: 1 / 3; grid-row: 1; align-self: center; }
+    td.grade-cell { grid-column: 3; grid-row: 1; justify-self: end; }
+    td.action-cell { grid-column: 3; grid-row: 2; justify-self: end; }
+    td.score { grid-column: 1 / 3; grid-row: 2; align-self: center; }
+    .report-foot { flex-direction: column; align-items: flex-start; }
+  }
+  @media (max-width: 400px) {
+    .stats { grid-template-columns: 1fr; }
+    .distribution { width: 100%; justify-content: center; }
+  }
+  /* ----- Theme toggle ----- */
+  .header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .theme-toggle {
+    background: var(--inset);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+  .theme-toggle:hover { border-color: var(--accent); }
+  .theme-toggle .icon { font-size: 1rem; }
+
+  /* ----- Notification bell & dropdown ----- */
+  .header-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+  .bell-wrap { position: relative; }
+  .bell-btn {
+    background: var(--inset);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: border-color .2s ease, background .2s ease;
+    line-height: 1;
+  }
+  .bell-btn:hover { border-color: var(--accent); background: var(--panel-hover); }
+  .bell-dot {
+    position: absolute;
+    top: -4px; right: -4px;
+    min-width: 17px; height: 17px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--bad);
+    color: #fff;
+    font-size: .68rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--panel);
+    box-sizing: content-box;
+    line-height: 1;
+  }
+  .bell-dot.hidden { display: none; }
+  .notif-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 320px;
+    max-width: calc(100vw - 24px);
+    max-height: 340px;
+    overflow-y: auto;
+    background: var(--panel);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    box-shadow: 0 14px 34px var(--shadow);
+    z-index: 50;
+    display: none;
+  }
+  .notif-panel.open { display: block; }
+  .notif-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+    background: var(--panel);
+  }
+  .notif-head h3 { font-size: .95rem; }
+  .notif-clear {
+    background: none; border: none; color: var(--accent);
+    font-size: .8rem; font-weight: 600; cursor: pointer; padding: 4px;
+  }
+  .notif-clear:hover { text-decoration: underline; }
+  .notif-list { list-style: none; }
+  .notif-list li {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: .85rem;
+    animation: notifIn .25s ease;
+  }
+  .notif-list li:last-child { border-bottom: none; }
+  .notif-list li .n-icon { flex: 0 0 auto; }
+  .notif-list li .n-body b { color: var(--text); }
+  .notif-list li .n-time {
+    display: block; color: var(--muted); font-size: .72rem; margin-top: 2px;
+  }
+  .notif-list li:hover { background: var(--row-hover); }
+  .notif-empty { padding: 22px 16px; text-align: center; color: var(--muted); font-size: .85rem; }
+  @keyframes notifIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* ----- Login / auth screens ----- */
+  .auth-wrap {
+    max-width: 420px;
+    margin: 6vh auto 0;
+    padding: 0 16px;
+  }
+  .auth-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px 26px;
+    box-shadow: 0 18px 50px var(--shadow);
+    text-align: center;
+  }
+  .auth-logo { font-size: 3rem; line-height: 1; }
+  .auth-card h1 { font-size: 1.7rem; margin: 10px 0 4px; }
+  .auth-card .tagline { color: var(--muted); font-size: .9rem; margin-bottom: 22px; }
+  .role-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .role-card {
+    background: var(--inset);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 10px;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, transform .15s ease;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text);
+    font-size: .95rem;
+  }
+  .role-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+  .role-card.selected {
+    border-color: var(--accent);
+    background: var(--row-hover);
+  }
+  .role-card .role-emoji { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+  .role-card .role-desc { display: block; color: var(--muted); font-weight: 400; font-size: .75rem; margin-top: 4px; }
+  .auth-form { display: flex; flex-direction: column; gap: 10px; text-align: left; margin-bottom: 14px; }
+  .auth-form label { font-size: .8rem; font-weight: 600; color: var(--muted); }
+  .auth-form input { width: 100%; }
+  .auth-form label:has(input[required])::after,
+  .auth-form label.full::after { content: ""; }
+  .auth-error {
+    display: none;
+    background: rgba(248,113,113,.12);
+    border: 1px solid rgba(248,113,113,.4);
+    color: var(--bad);
+    font-size: .82rem;
+    font-weight: 600;
+    padding: 9px 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  .auth-error.show { display: block; }
+  .auth-switch {
+    font-size: .85rem; color: var(--muted); margin-top: 14px;
+  }
+  .auth-switch a { color: var(--accent); cursor: pointer; font-weight: 600; text-decoration: none; }
+  .auth-switch a:hover { text-decoration: underline; }
+  .auth-full-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: .95rem;
+  }
+  .user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--inset);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    padding: 6px 14px 6px 8px;
+    font-size: .82rem;
+    font-weight: 600;
+  }
+  .user-chip .role-tag {
+    font-size: .68rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: var(--btn-text);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .logout-btn {
+    background: none;
+    border: 1px solid var(--border-strong);
+    color: var(--muted);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: .78rem;
+    cursor: pointer;
+  }
+  .logout-btn:hover { color: var(--bad); border-color: var(--bad); }
+
+  /* ----- Password visibility toggle ----- */
+  .pw-field { position: relative; display: block; }
+  .pw-field input { width: 100%; padding-right: 44px; }
+  .pw-eye {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.05rem;
+    line-height: 1;
+    padding: 6px;
+    border-radius: 50%;
+    color: var(--muted);
+    filter: grayscale(1);
+    transition: filter .15s ease, color .15s ease;
+  }
+  .pw-eye:hover { filter: none; color: var(--text); }
+  .pw-eye.revealed { filter: none; }
+</style>
+</head>
+<body>
+<!-- ===== Login screen ===== -->
+<div id="authScreen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">🎓</div>
+      <h1>Gradely</h1>
+      <p class="tagline">Track grades. Celebrate progress. Together.</p>
+
+      <div id="roleStep">
+        <div class="role-grid">
+          <button type="button" class="role-card" data-role="parent">
+            <span class="role-emoji">👨‍👩‍👧</span> Parent
+            <span class="role-desc">Follow your child's scores</span>
+          </button>
+          <button type="button" class="role-card" data-role="mentor">
+            <span class="role-emoji">🧑‍🏫</span> Mentor
+            <span class="role-desc">Guide and grade students</span>
+          </button>
+        </div>
+        <div class="auth-error" id="roleError">Please choose Parent or Mentor to continue.</div>
+      </div>
+
+      <div id="loginStep" style="display:none">
+        <form class="auth-form" id="loginForm">
+          <label>Username
+            <input type="text" id="loginUser" autocomplete="username" required>
+          </label>
+          <label>Password
+            <span class="pw-field">
+              <input type="password" id="loginPass" autocomplete="current-password" required>
+              <button type="button" class="pw-eye" data-pw="loginPass" title="Show password" aria-label="Show password">👁</button>
+            </span>
+          </label>
+          <button type="submit" class="auth-full-btn" id="loginBtnAction">Log in as Parent</button>
+        </form>
+        <div class="auth-error" id="loginError">Incorrect password. Please try again.</div>
+        <p class="auth-switch">First time here? <a id="gotoSignup">Create an account</a></p>
+        <p class="auth-switch"><a id="roleBack">← Change role</a></p>
+      </div>
+
+      <div id="signupStep" style="display:none">
+        <form class="auth-form" id="signupForm">
+          <label>Username
+            <input type="text" id="signupUser" autocomplete="username" required>
+          </label>
+          <label>Password <small>(min 4 characters)</small>
+            <span class="pw-field">
+              <input type="password" id="signupPass" autocomplete="new-password" minlength="4" required>
+              <button type="button" class="pw-eye" data-pw="signupPass" title="Show password" aria-label="Show password">👁</button>
+            </span>
+          </label>
+          <label>Confirm password
+            <span class="pw-field">
+              <input type="password" id="signupPass2" autocomplete="new-password" minlength="4" required>
+              <button type="button" class="pw-eye" data-pw="signupPass2" title="Show password" aria-label="Show password">👁</button>
+            </span>
+          </label>
+          <button type="submit" class="auth-full-btn" id="signupBtnAction">Create account</button>
+        </form>
+        <div class="auth-error" id="signupError"></div>
+        <p class="auth-switch">Already registered? <a id="gotoLogin">Log in</a></p>
+        <p class="auth-switch"><a id="roleBackSignup">← Change role</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== App ===== -->
+<div id="appScreen" style="display:none">
+<div class="wrap">
+  <div class="header-row">
+    <h1>🎓 Gradely</h1>
+    <div class="header-actions">
+      <span class="user-chip" id="userChip" style="display:none"><span id="chipName"></span><span class="role-tag" id="chipRole"></span></span>
+      <button class="logout-btn" id="logoutBtn" style="display:none">Log out</button>
+      <div class="bell-wrap">
+        <button class="bell-btn" id="bellBtn" title="Notifications" aria-label="Notifications">🔔
+          <span class="bell-dot hidden" id="bellDot"></span>
+        </button>
+        <div class="notif-panel" id="notifPanel">
+          <div class="notif-head">
+            <h3>Notifications</h3>
+            <button class="notif-clear" id="notifClear">Clear all</button>
+          </div>
+          <div class="notif-empty" id="notifEmpty">You're all caught up 🎉</div>
+          <ul class="notif-list" id="notifList"></ul>
+        </div>
+      </div>
+      <button class="theme-toggle" id="themeToggle" title="Switch theme" aria-label="Switch theme">
+        <span class="icon" id="themeIcon">☀️</span><span id="themeLabel">Light</span>
+      </button>
+    </div>
+  </div>    <p class="sub" id="subTagline">Track grades. Celebrate progress. Together.</p>
+
+  <div class="stats">
+    <div class="stat avg"><div class="label">Average score</div><div class="value" id="statAvg">—</div></div>
+    <div class="stat high"><div class="label">Highest score</div><div class="value" id="statHigh">—</div></div>
+    <div class="stat low"><div class="label">Lowest score</div><div class="value" id="statLow">—</div></div>
+    <div class="stat count"><div class="label">Students</div><div class="value" id="statCount">0</div></div>
+  </div>
+
+  <div class="panel">
+    <h2>Add student</h2>
+    <form id="addForm">
+      <input type="text" id="inName" placeholder="Student name" required>
+      <input type="number" id="inScore" min="0" max="100" step="0.1" placeholder="Score (0–100)" required>
+      <button type="submit">Add</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Grading scale</h2>
+    <table class="scale-table">
+      <thead>
+        <tr><th class="scale-graded">Grade</th><th>Marks range</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="scale-graded"><span class="grade A">A</span></td><td>90 – 100</td></tr>
+        <tr><td class="scale-graded"><span class="grade B">B</span></td><td>80 – 89</td></tr>
+        <tr><td class="scale-graded"><span class="grade C">C</span></td><td>70 – 79</td></tr>
+        <tr><td class="scale-graded"><span class="grade D">D</span></td><td>60 – 69</td></tr>
+        <tr><td class="scale-graded"><span class="grade F">F</span></td><td>0 – 59</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <div class="report-head">
+      <h2>Summary report</h2>
+      <span class="badge" id="filterBadge">All students</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th data-sort="name">Name ⇅</th>
+          <th data-sort="score">Score ⇅</th>
+          <th>Grade</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="report-foot">
+      <span>Total students: <strong id="footCount">0</strong> · Class average: <strong id="footAvg">—</strong></span>
+      <span class="distribution" id="distribution"></span>
+    </div>
+    <div class="empty" id="empty">No students yet — add one above.</div>
+  </div>
+</div>
+</div>
+
+<script>
+  /* ================= Auth: Gradely accounts ================= */
+  const App = { users: null, session: null, role: null };
+
+  function loadUsers() {
+    try { return JSON.parse(localStorage.getItem('gradely_users') || '{}'); } catch { return {}; }
+  }
+  function saveUsers(u) {
+    try { localStorage.setItem('gradely_users', JSON.stringify(u)); } catch {}
+  }
+  function loadSession() {
+    try { return JSON.parse(localStorage.getItem('gradely_session') || 'null'); } catch { return null; }
+  }
+  function saveSession(s) {
+    try { s ? localStorage.setItem('gradely_session', JSON.stringify(s)) : localStorage.removeItem('gradely_session'); } catch {}
+  }
+
+  /* SHA-256 hash of password text; salted per-user, hex-encoded */
+  function hashPassword(password) {
+    const data = new TextEncoder().encode(password);
+    return crypto.subtle.digest('SHA-256', data).then(buf =>
+      [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('')
+    );
+  }
+
+  function showAuthStep(step) {
+    for (const s of ['roleStep', 'loginStep', 'signupStep']) {
+      document.getElementById(s).style.display = (s === step) ? 'block' : 'none';
+    }
+    for (const id of ['roleError', 'loginError', 'signupError']) {
+      document.getElementById(id).classList.remove('show');
+    }
+  }
+
+  function showAuthError(id, msg) {
+    const el = document.getElementById(id);
+    if (msg) el.textContent = msg;
+    el.classList.add('show');
+  }
+
+  function setRoleVisual(role) {
+    document.querySelectorAll('.role-card').forEach(c =>
+      c.classList.toggle('selected', c.dataset.role === role));
+    document.getElementById('loginBtnAction').textContent = `Log in as ${role === 'parent' ? 'Parent' : 'Mentor'}`;
+    document.getElementById('signupBtnAction').textContent = `Create ${role === 'parent' ? 'Parent' : 'Mentor'} account`;
+  }
+
+  function currentUserExists(username) {
+    return !!App.users[username.toLowerCase()];
+  }
+
+  function updateLoginAction() {
+    document.getElementById('loginBtnAction').textContent = `Log in as ${App.role === 'parent' ? 'Parent' : 'Mentor'}`;
+    document.getElementById('signupBtnAction').textContent = `Create ${App.role === 'parent' ? 'Parent' : 'Mentor'} account`;
+  }
+
+  function enterApp() {
+    const s = App.session;
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'block';
+    document.getElementById('chipName').textContent = s.username;
+    document.getElementById('chipRole').textContent = s.role === 'parent' ? 'Parent' : 'Mentor';
+    document.getElementById('userChip').style.display = 'inline-flex';
+    document.getElementById('logoutBtn').style.display = 'inline-block';
+  }
+
+  function exitApp() {
+    document.getElementById('appScreen').style.display = 'none';
+    document.getElementById('authScreen').style.display = 'block';
+    document.getElementById('userChip').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'none';
+    const live = loadSession();
+    App.role = live ? live.role : App.role;
+    showAuthStep(live ? 'loginStep' : 'roleStep');
+    if (live) {
+      document.getElementById('loginUser').value = live.username;
+      updateLoginAction();
+    }
+  }
+
+  (function initAuth() {
+    /* Step 1: role cards */
+    const roleError = document.getElementById('roleError');
+    let chosenRole = null;
+    document.querySelectorAll('.role-card').forEach(card => {
+      card.onclick = () => {
+        chosenRole = card.dataset.role;
+        roleError.classList.remove('show');
+        setRoleVisual(chosenRole);
+        App.role = chosenRole;
+        updateLoginAction();
+        showAuthStep('loginStep');
+      };
+    });
+
+    /* password visibility toggles (all 👁 buttons) */
+    document.querySelectorAll('.pw-eye').forEach(eye => {
+      eye.onclick = () => {
+        const input = document.getElementById(eye.dataset.pw);
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        eye.classList.toggle('revealed', show);
+        eye.title = show ? 'Hide password' : 'Show password';
+        eye.setAttribute('aria-label', eye.title);
+        input.focus({ preventScroll: true });
+      };
+    });
+
+    document.getElementById('roleBack').onclick = () => { chosenRole = null; showAuthStep('roleStep'); };
+    document.getElementById('roleBackSignup').onclick = () => { chosenRole = null; showAuthStep('roleStep'); };
+    document.getElementById('gotoSignup').onclick = () => showAuthStep('signupStep');
+    document.getElementById('gotoLogin').onclick = () => showAuthStep('loginStep');
+
+    /* Step 2a: login (subsequent logins) */
+    document.getElementById('loginForm').onsubmit = async e => {
+      e.preventDefault();
+      if (!App.role) { showAuthError('loginError', 'Please choose Parent or Mentor first.'); return; }
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value;
+      const rec = App.users[u.toLowerCase()];
+      if (!rec) { showAuthError('loginError', `No account for "${u}". Create one first.`); return; }
+      if (rec.role !== App.role) {
+        showAuthError('loginError', `"${u}" is registered as ${rec.role === 'parent' ? 'a Parent' : 'a Mentor'}. Switch role and try again.`);
+        return;
+      }
+      const h = await hashPassword(p);
+      if (rec.passwordHash !== h) { showAuthError('loginError', `Incorrect password for "${u}". Please try again.`); return; }
+      App.session = { username: rec.username, role: rec.role };
+      saveSession(App.session);
+      enterApp();
+    };
+
+    /* Step 2b: signup (first time) */
+    document.getElementById('signupForm').onsubmit = async e => {
+      e.preventDefault();
+      if (!App.role) { showAuthError('signupError', 'Please choose Parent or Mentor first.'); return; }
+      const u = document.getElementById('signupUser').value.trim();
+      const p = document.getElementById('signupPass').value;
+      const p2 = document.getElementById('signupPass2').value;
+      if (!u) { showAuthError('signupError', 'Username cannot be empty.'); return; }
+      if (p.length < 4) { showAuthError('signupError', 'Password must be at least 4 characters.'); return; }
+      if (p !== p2) { showAuthError('signupError', 'Passwords do not match.'); return; }
+      if (currentUserExists(u)) { showAuthError('signupError', `"${u}" is already taken. Try logging in instead.`); return; }
+      const h = await hashPassword(p);
+      App.users[u.toLowerCase()] = { username: u, role: App.role, passwordHash: h, created: Date.now() };
+      saveUsers(App.users);
+      App.session = { username: u, role: App.role };
+      saveSession(App.session);
+      enterApp();
+    };
+
+    document.getElementById('logoutBtn').onclick = () => {
+      App.session = null;
+      saveSession(null);
+      exitApp();
+      document.getElementById('loginPass').value = '';
+    };
+
+    /* boot: auto-restore session if valid; otherwise show login screen */
+    App.users = loadUsers();
+    const saved = loadSession();
+    if (saved && App.users[saved.username.toLowerCase()] &&
+        App.users[saved.username.toLowerCase()].role === saved.role) {
+      App.session = saved;
+      App.role = saved.role;
+      enterApp();
+      showAuthStep('loginStep');
+    } else {
+      saveSession(null);
+      showAuthStep('roleStep');
+    }
+  })();
+
+  let students = load() || [
+    { name: 'Alice',   score: 85 },
+    { name: 'Bob',     score: 92 },
+    { name: 'Charlie', score: 78 }
+  ];
+  let sortKey = null, sortDir = 1;
+
+  /* ----- Theme toggle: OS preference first, then saved choice, then user clicks ----- */
+  const root = document.documentElement;
+  function applyTheme(theme) {
+    root.setAttribute('data-theme', theme);
+    document.getElementById('themeIcon').textContent = theme === 'light' ? '☀️' : '🌙';
+    document.getElementById('themeLabel').textContent = theme === 'light' ? 'Dark mode' : 'Light mode';
+  }
+  (function initTheme() {
+    let saved = null;
+    try { saved = localStorage.getItem('theme'); } catch {}
+    if (saved !== 'light' && saved !== 'dark') {
+      saved = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+    }
+    applyTheme(saved);
+    document.getElementById('themeToggle').onclick = () => {
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      applyTheme(next);
+      try { localStorage.setItem('theme', next); } catch {}
+    };
+  })();
+
+  function load() {
+    try { const raw = localStorage.getItem('students'); return raw ? JSON.parse(raw) : null; }
+    catch { return null; }
+  }
+  function save() { try { localStorage.setItem('students', JSON.stringify(students)); } catch {} }
+
+  function gradeOf(s) {
+    return s >= 90 ? 'A' : s >= 80 ? 'B' : s >= 70 ? 'C' : s >= 60 ? 'D' : 'F';
+  }
+
+  function render() {
+    save();
+    const tbody = document.getElementById('tbody');
+    const empty = document.getElementById('empty');
+    tbody.innerHTML = '';
+    let rows = [...students];
+    if (sortKey) {
+      rows.sort((a, b) =>
+        sortKey === 'name'
+          ? a.name.localeCompare(b.name) * sortDir
+          : (a.score - b.score) * sortDir
+      );
+    }
+    for (const s of rows) {
+      const tr = document.createElement('tr');
+      const g = gradeOf(s.score);
+      const scoreNum = s.score.toFixed(1);
+      const slno = rows.indexOf(s) + 1;
+      tr.innerHTML =
+        `<td class="name-cell"><span class="slno">${slno}</span>${escapeHtml(s.name)}</td>` +
+        `<td class="score">${scoreNum}<div class="bar"><div style="width:${s.score}%"></div></div></td>` +
+        `<td class="grade-cell"><span class="grade ${g}">${g}</span></td>` +
+        `<td class="action-cell"><button class="del" title="Remove">✕</button></td>`;
+      tr.querySelector('.del').onclick = () => {
+        students = students.filter(x => x !== s);
+        addNotification('remove', s.name, null);
+        render();
+      };
+      tbody.appendChild(tr);
+    }
+    empty.style.display = students.length ? 'none' : 'block';
+
+    const el = id => document.getElementById(id);
+    if (students.length) {
+      const sum = students.reduce((a, s) => a + s.score, 0);
+      const high = students.reduce((a, s) => s.score > a.score ? s : a);
+      const low = students.reduce((a, s) => s.score < a.score ? s : a);
+      el('statAvg').textContent = (sum / students.length).toFixed(2);
+      el('statHigh').textContent = `${high.score.toFixed(1)} (${high.name})`;
+      el('statLow').textContent = `${low.score.toFixed(1)} (${low.name})`;
+    } else {
+      el('statAvg').textContent = '—';
+      el('statHigh').textContent = '—';
+      el('statLow').textContent = '—';
+    }
+    el('statCount').textContent = students.length;
+    el('footCount').textContent = students.length;
+    if (students.length) {
+      el('footAvg').textContent = (students.reduce((a, s) => a + s.score, 0) / students.length).toFixed(2);
+    } else {
+      el('footAvg').textContent = '—';
+    }
+    el('filterBadge').textContent = sortKey === 'name' ? `Sorted by name${sortDir === 1 ? ' (A→Z)' : ' (Z→A)'}`
+      : sortKey === 'score' ? `Ranked by score${sortDir === 1 ? ' (low→high)' : ' (high→low)'}`
+      : 'All students';
+    const dist = el('distribution');
+    dist.innerHTML = '';
+    const counts = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+    for (const s of students) counts[gradeOf(s.score)]++;
+    for (const g of ['A', 'B', 'C', 'D', 'F']) {
+      if (!counts[g]) continue;
+      const chip = document.createElement('span');
+      chip.className = `dist-chip ${g}`;
+      chip.innerHTML = `${g}<small>×${counts[g]}</small>`;
+      dist.appendChild(chip);
+    }
+  }
+
+  /* ----- Notifications ----- */
+  const notifList = document.getElementById('notifList');
+  const notifEmpty = document.getElementById('notifEmpty');
+  const bellDot = document.getElementById('bellDot');
+  let notifCount = 0;
+
+  function timeAgo(ts) {
+    const s = Math.floor((Date.now() - ts) / 1000);
+    if (s < 5) return 'just now';
+    if (s < 60) return s + 's ago';
+    const m = Math.floor(s / 60);
+    if (m < 60) return m + 'm ago';
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + 'h ago';
+    return Math.floor(h / 24) + 'd ago';
+  }
+
+  function addNotification(kind, name, extra) {
+    const li = document.createElement('li');
+    const icon = kind === 'add' ? '➕' : '➖';
+    const verb = kind === 'add' ? 'New student added' : 'Student removed';
+    li.innerHTML = `<span class="n-icon">${icon}</span>` +
+      `<span class="n-body"><b>${escapeHtml(name)}</b> — ${verb}` +
+      `${extra ? ` · score ${extra}` : ''}` +
+      `<span class="n-time" data-ts="${Date.now()}">just now</span></span>`;
+    notifList.prepend(li);
+    notifEmpty.style.display = 'none';
+    notifCount++;
+    updateBellDot();
+  }
+
+  function updateBellDot() {
+    if (notifCount > 0) {
+      bellDot.textContent = notifCount > 99 ? '99+' : notifCount;
+      bellDot.classList.remove('hidden');
+    } else {
+      bellDot.classList.add('hidden');
+    }
+  }
+
+  function refreshTimes() {
+    notifList.querySelectorAll('.n-time[data-ts]').forEach(el => {
+      el.textContent = timeAgo(Number(el.dataset.ts));
+    });
+  }
+  setInterval(refreshTimes, 15000);
+
+  const notifPanel = document.getElementById('notifPanel');
+  const bellBtn = document.getElementById('bellBtn');
+
+  bellBtn.onclick = e => {
+    e.stopPropagation();
+    notifPanel.classList.toggle('open');
+    if (notifPanel.classList.contains('open')) {
+      notifCount = 0;
+      updateBellDot();
+      refreshTimes();
+    }
+  };
+
+  document.addEventListener('click', e => {
+    if (!notifPanel.classList.contains('open')) return;
+    if (notifPanel.contains(e.target) || bellBtn.contains(e.target)) return;
+    notifPanel.classList.remove('open');
+  });
+
+  document.getElementById('notifClear').onclick = e => {
+    e.stopPropagation();
+    notifList.innerHTML = '';
+    notifCount = 0;
+    updateBellDot();
+    notifEmpty.style.display = 'block';
+  };
+
+  function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  document.getElementById('addForm').onsubmit = e => {
+    e.preventDefault();
+    const nameEl = document.getElementById('inName');
+    const scoreEl = document.getElementById('inScore');
+    const name = nameEl.value.trim();
+    const score = parseFloat(scoreEl.value);
+    if (!name || isNaN(score) || score < 0 || score > 100) return;
+    if (students.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+      alert('A student with that name already exists.');
+      return;
+    }
+    students.push({ name, score });
+    addNotification('add', name, score);
+    nameEl.value = ''; scoreEl.value = '';
+    render();
+  };
+
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+    th.onclick = () => {
+      const key = th.dataset.sort;
+      sortDir = (sortKey === key) ? -sortDir : 1;
+      sortKey = key;
+      render();
+    };
+  });
+
+  render();
+</script>
+</body>
+</html>

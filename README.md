@@ -12,7 +12,7 @@ Folder: codealpha_tasks/CodeAlpha_Artificial_Intelligence_Chatbot/
 
 <p> The Artificial Intelligence Chatbot is a Java-based conversational application designed to understand user questions and provide relevant responses using Natural Language Processing (NLP) techniques. </p>
 
-Key Features:
+<h4>Key Features:</h4>
 <ul>
   <li>Browser-based chat interface.
 </li>

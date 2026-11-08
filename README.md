@@ -1,7 +1,5 @@
 # CodeAlpha_ProjectName
 
-Author : Oishee Biswas
-
 This repository contains four independent projects developed as part of the CodeAlpha Internship. These projects demonstrate practical programming concepts through applications involving artificial intelligence, hotel booking, stock trading, and student grade management.
 
 Projects Overview
@@ -163,3 +161,24 @@ javac Student.java GradeManager.java <br>
 java GradeManager
 
 <h3>Requirement for the Java version: Java Development Kit (JDK).</h3>
+
+---
+
+## 🙌 Acknowledgements
+
+- [Freebuff]([https://freebuff.com/]) – AI-powered development platform used during project development.
+- The open-source developer community for the tools and libraries used in this project.
+
+---
+
+## 👩‍💻 Author
+
+**Oishee Biswas**
+
+GitHub: [@oishee17](https://github.com/oishee17)
+
+---
+
+⭐ If you find this project interesting, consider giving the repository a star!
+
+**Made with ❤️ and a passion for building interactive web experiences.**
